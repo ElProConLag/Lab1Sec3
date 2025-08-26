@@ -50,11 +50,11 @@ def main():
         text_to_encrypt = sys.argv[1]
         shift_value = int(sys.argv[2])
         
-        print(f"Original text: {text_to_encrypt}")
-        print(f"Shift value: {shift_value}")
+        print(f"Original text: {text_to_encrypt}", file=sys.stderr)
+        print(f"Shift value: {shift_value}", file=sys.stderr)
         
         encrypted_text = caesar_encrypt(text_to_encrypt, shift_value)
-        print(f"Encrypted text: {encrypted_text}")
+        print(encrypted_text)
         
         return encrypted_text
         
