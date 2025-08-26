@@ -100,7 +100,7 @@ def run_demo():
 def main():
     """Main function."""
     # Check if we're in the correct directory
-    if not os.path.exists('/home/runner/work/Lab1Sec3/Lab1Sec3/caesar_cipher.py'):
+    if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'caesar_cipher.py')):
         print("Error: Lab files not found. Please run from the correct directory.")
         sys.exit(1)
     
