@@ -6,7 +6,7 @@ Activity 3: MitM
 
 This program intercepts ICMP packets and attempts to decode Caesar cipher messages
 by trying all possible shift combinations (0-25) and highlighting the most probable
-plaintext in green.
+plaintext in green. Supports Unicode characters transmitted as UTF-8 byte sequences.
 """
 
 import socket
@@ -19,18 +19,20 @@ from collections import Counter
 def caesar_decrypt(text, shift):
     """
     Decrypt text using Caesar cipher with the given shift value.
+    Supports Unicode characters - only ASCII letters are decrypted, Unicode characters are preserved.
     
     Args:
-        text (str): The text to decrypt
+        text (str): The text to decrypt (supports Unicode)
         shift (int): The number of positions to shift back
         
     Returns:
-        str: The decrypted text
+        str: The decrypted text with Unicode characters preserved
     """
     decrypted_text = ""
     
     for char in text:
-        if char.isalpha():
+        # Only apply Caesar cipher to ASCII letters, preserve all other characters including Unicode
+        if char.isalpha() and ord(char) < 128:  # ASCII letters only
             # Handle uppercase letters
             if char.isupper():
                 decrypted_char = chr((ord(char) - ord('A') - shift) % 26 + ord('A'))
@@ -39,7 +41,7 @@ def caesar_decrypt(text, shift):
                 decrypted_char = chr((ord(char) - ord('a') - shift) % 26 + ord('a'))
             decrypted_text += decrypted_char
         else:
-            # Non-alphabetic characters remain unchanged
+            # Non-ASCII alphabetic characters and all other characters remain unchanged
             decrypted_text += char
     
     return decrypted_text
@@ -119,13 +121,13 @@ def calculate_english_score(text):
 
 def parse_icmp_packet(packet):
     """
-    Parse an ICMP packet and extract the character from the data field.
+    Parse an ICMP packet and extract the byte value from the data field.
     
     Args:
         packet (bytes): The raw packet data
         
     Returns:
-        tuple: (icmp_type, character) or (None, None) if not a valid ICMP Echo Request
+        tuple: (icmp_type, byte_value, sequence) or (None, None, None) if not a valid ICMP Echo Request
     """
     try:
         # Parse IP header (20 bytes minimum)
@@ -138,11 +140,11 @@ def parse_icmp_packet(packet):
         
         # Only process ICMP Echo Request packets (type 8)
         if icmp_type == 8:
-            # Extract the first byte of ICMP data (our hidden character)
+            # Extract the first byte of ICMP data (our hidden byte)
             data_start = ip_header_length + 8
             if len(packet) > data_start:
-                character = chr(packet[data_start])
-                return icmp_type, character, sequence
+                byte_value = packet[data_start]
+                return icmp_type, byte_value, sequence
         
         return None, None, None
         
@@ -152,7 +154,7 @@ def parse_icmp_packet(packet):
 
 def capture_icmp_packets():
     """
-    Capture ICMP packets and extract hidden characters.
+    Capture ICMP packets and extract hidden bytes, then reconstruct UTF-8 message.
     
     Returns:
         str: The reconstructed message from ICMP packets
@@ -165,30 +167,43 @@ def capture_icmp_packets():
         print("Press Ctrl+C to stop and analyze captured data")
         print("-" * 50)
         
-        captured_chars = {}
+        captured_bytes = {}
         
         while True:
             packet, addr = sock.recvfrom(1024)
-            icmp_type, character, sequence = parse_icmp_packet(packet)
+            icmp_type, byte_value, sequence = parse_icmp_packet(packet)
             
-            if icmp_type == 8 and character:  # ICMP Echo Request
-                print(f"Captured packet {sequence}: Character '{character}' from {addr[0]}")
-                captured_chars[sequence] = character
+            if icmp_type == 8 and byte_value is not None:  # ICMP Echo Request
+                # Show character representation for readability
+                try:
+                    char_repr = chr(byte_value) if 32 <= byte_value <= 126 else f"\\x{byte_value:02x}"
+                except ValueError:
+                    char_repr = f"\\x{byte_value:02x}"
                 
-                # Check if we received the end marker 'b'
-                if character == 'b':
-                    print("End marker 'b' received. Stopping capture.")
+                print(f"Captured packet {sequence}: Byte {byte_value} ({char_repr}) from {addr[0]}")
+                captured_bytes[sequence] = byte_value
+                
+                # Check if we received the end marker (byte 255)
+                if byte_value == 255:
+                    print("End marker (byte 255) received. Stopping capture.")
                     break
         
         sock.close()
         
         # Reconstruct message in sequence order (excluding the end marker)
-        message = ""
-        for seq in sorted(captured_chars.keys()):
-            if captured_chars[seq] != 'b':  # Exclude end marker
-                message += captured_chars[seq]
+        byte_list = []
+        for seq in sorted(captured_bytes.keys()):
+            if captured_bytes[seq] != 255:  # Exclude end marker
+                byte_list.append(captured_bytes[seq])
         
-        return message
+        # Convert bytes back to UTF-8 string
+        try:
+            message = bytes(byte_list).decode('utf-8')
+            return message
+        except UnicodeDecodeError as e:
+            print(f"Warning: Could not decode as UTF-8: {e}")
+            # Return as latin-1 to preserve all byte values
+            return bytes(byte_list).decode('latin-1')
         
     except PermissionError:
         print("Error: This program requires root privileges to capture packets.")
@@ -199,11 +214,19 @@ def capture_icmp_packets():
         sock.close()
         
         # Reconstruct message from captured data
-        message = ""
-        for seq in sorted(captured_chars.keys()):
-            if captured_chars[seq] != 'b':  # Exclude end marker
-                message += captured_chars[seq]
-        return message
+        byte_list = []
+        for seq in sorted(captured_bytes.keys()):
+            if captured_bytes[seq] != 255:  # Exclude end marker
+                byte_list.append(captured_bytes[seq])
+        
+        # Convert bytes back to UTF-8 string
+        try:
+            message = bytes(byte_list).decode('utf-8')
+            return message
+        except UnicodeDecodeError as e:
+            print(f"Warning: Could not decode as UTF-8: {e}")
+            # Return as latin-1 to preserve all byte values
+            return bytes(byte_list).decode('latin-1')
     except Exception as e:
         print(f"Error: {e}")
         return None

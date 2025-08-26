@@ -13,18 +13,20 @@ import sys
 def caesar_encrypt(text, shift):
     """
     Encrypt text using Caesar cipher with the given shift value.
+    Supports Unicode characters - only ASCII letters are encrypted, Unicode characters are preserved.
     
     Args:
-        text (str): The text to encrypt
+        text (str): The text to encrypt (supports Unicode)
         shift (int): The number of positions to shift each character
         
     Returns:
-        str: The encrypted text
+        str: The encrypted text with Unicode characters preserved
     """
     encrypted_text = ""
     
     for char in text:
-        if char.isalpha():
+        # Only apply Caesar cipher to ASCII letters, preserve all other characters including Unicode
+        if char.isalpha() and ord(char) < 128:  # ASCII letters only
             # Handle uppercase letters
             if char.isupper():
                 encrypted_char = chr((ord(char) - ord('A') + shift) % 26 + ord('A'))
@@ -33,7 +35,7 @@ def caesar_encrypt(text, shift):
                 encrypted_char = chr((ord(char) - ord('a') + shift) % 26 + ord('a'))
             encrypted_text += encrypted_char
         else:
-            # Non-alphabetic characters remain unchanged
+            # Non-ASCII alphabetic characters and all other characters remain unchanged
             encrypted_text += char
     
     return encrypted_text
