@@ -61,6 +61,13 @@ def create_icmp_packet(data_char, packet_id, sequence):
     # Convert character to bytes and pad to look like normal ping data
     # Normal ping sends 32 bytes of data by default
     data = data_char.encode('utf-8')
+
+    # This check is critical. The padding logic assumes a single-byte character
+    # to create a 32-byte payload. Multi-byte characters would create oversized
+    # packets, defeating the 'stealth' purpose of the tool.
+    if len(data) != 1:
+        raise ValueError(f"Character '{data_char}' encodes to more than one byte, which is not supported.")
+
     # Pad with standard ping pattern (incrementing bytes starting from 0x08)
     padding = bytes([(i + 8) % 256 for i in range(31)])
     full_data = data + padding
