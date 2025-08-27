@@ -72,7 +72,7 @@ sudo python3 stealth_ping.py localhost "Khoor Zruog"
 sudo python3 mitm_decoder.py
 
 # Modo simulación con texto cifrado proporcionado
-python3 mitm_decoder.py <mensaje_cifrado>
+python3 mitm_decoder.py <encrypted_message>
 ```
 
 **Ejemplos**:
