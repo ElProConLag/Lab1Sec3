@@ -20,7 +20,7 @@ El objetivo es auditar si los sistemas DPI pueden detectar efectivamente la exfi
 
 **Uso**:
 ```bash
-python3 caesar_cipher.py <texto_a_cifrar> <valor_desplazamiento>
+python3 caesar_cipher.py <text_to_encrypt> <shift_value>
 ```
 
 **Ejemplo**:
