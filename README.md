@@ -119,7 +119,7 @@ Esto ejecuta una demostración completa mostrando:
    # Salida: Zljyla Khah
    ```
 
-2. **Transmitir via ICMP stealth** (simulación):
+2. **Transmitir vía ICMP stealth** (simulación):
    - Cada carácter enviado en paquete ICMP separado
    - Los paquetes se ven idénticos al tráfico ping normal
    - El marcador de fin 'b' señala transmisión completa
