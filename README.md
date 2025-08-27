@@ -1,203 +1,203 @@
-# Lab 1 - Cybersecurity: DPI Evasion via ICMP Stealth Mode
+# Laboratorio 1 - Ciberseguridad: Evasión de DPI mediante Modo Stealth ICMP
 
-## Overview
+## Resumen
 
-This laboratory demonstrates how attackers can evade Deep Packet Inspection (DPI) systems by hiding encrypted data within seemingly innocent ICMP ping traffic. The implementation consists of three Python programs that showcase the complete attack chain from encryption to data exfiltration to interception and decoding.
+Este laboratorio demuestra cómo los atacantes pueden evadir los sistemas de Inspección Profunda de Paquetes (DPI) ocultando datos cifrados dentro de tráfico ICMP ping aparentemente inocente. La implementación consiste en tres programas Python que muestran la cadena completa de ataque desde el cifrado hasta la exfiltración de datos y la interceptación y decodificación.
 
-## Lab Objectives
+## Objetivos del Laboratorio
 
-The goal is to audit whether DPI systems can effectively detect data exfiltration through network traffic by:
+El objetivo es auditar si los sistemas DPI pueden detectar efectivamente la exfiltración de datos a través del tráfico de red mediante:
 
-1. Creating a Caesar cipher encryption algorithm
-2. Implementing stealth data transmission via ICMP packets
-3. Demonstrating a Man-in-the-Middle (MitM) attack to intercept and decode hidden messages
+1. Creación de un algoritmo de cifrado César
+2. Implementación de transmisión stealth de datos via paquetes ICMP
+3. Demostración de un ataque Man-in-the-Middle (MitM) para interceptar y decodificar mensajes ocultos
 
-## Programs Implemented
+## Programas Implementados
 
-### 1. Caesar Cipher Encryption (`caesar_cipher.py`)
+### 1. Cifrado César (`caesar_cipher.py`)
 
-**Purpose**: Encrypt plaintext messages using the Caesar cipher algorithm with a configurable shift value.
+**Propósito**: Cifrar mensajes de texto plano usando el algoritmo de cifrado César con un valor de desplazamiento configurable.
 
-**Usage**:
+**Uso**:
 ```bash
-python3 caesar_cipher.py <text_to_encrypt> <shift_value>
+python3 caesar_cipher.py <texto_a_cifrar> <valor_desplazamiento>
 ```
 
-**Example**:
+**Ejemplo**:
 ```bash
 python3 caesar_cipher.py "Hello World" 3
-# Output: Khoor Zruog
+# Salida: Khoor Zruog
 ```
 
-**Features**:
-- Handles both uppercase and lowercase letters
-- Preserves non-alphabetic characters (spaces, punctuation)
-- Supports any shift value (automatically wraps around the alphabet)
+**Características**:
+- Maneja letras mayúsculas y minúsculas
+- Preserva caracteres no alfabéticos (espacios, puntuación)
+- Soporta cualquier valor de desplazamiento (se ajusta automáticamente alrededor del alfabeto)
 
-### 2. Stealth ICMP Transmission (`stealth_ping.py`)
+### 2. Transmisión ICMP Stealth (`stealth_ping.py`)
 
-**Purpose**: Transmit encrypted messages through ICMP Echo Request packets, embedding one character per packet in the data field to avoid DPI detection.
+**Propósito**: Transmitir mensajes cifrados a través de paquetes ICMP Echo Request, incrustando un carácter por paquete en el campo de datos para evitar la detección DPI.
 
-**Usage**:
+**Uso**:
 ```bash
-sudo python3 stealth_ping.py <target_host> <encrypted_message>
+sudo python3 stealth_ping.py <host_objetivo> <mensaje_cifrado>
 ```
 
-**Example**:
+**Ejemplo**:
 ```bash
 sudo python3 stealth_ping.py localhost "Khoor Zruog"
 ```
 
-**Key Features**:
-- Mimics standard ping behavior (timing, packet structure, size)
-- Uses process ID as packet identifier (like real ping)
-- Sends packets with 1-second intervals
-- 32-byte data payload with standard ping pattern
-- Marks end of transmission with character 'b'
-- Requires root privileges for raw socket access
+**Características Clave**:
+- Imita el comportamiento estándar de ping (temporización, estructura de paquetes, tamaño)
+- Usa ID de proceso como identificador de paquete (como el ping real)
+- Envía paquetes con intervalos de 1 segundo
+- Payload de datos de 32 bytes con patrón estándar de ping
+- Marca el final de transmisión con el carácter 'b'
+- Requiere privilegios de root para acceso a socket raw
 
-**DPI Evasion Techniques**:
-- Identical ICMP header structure to legitimate ping
-- Standard packet timing and size
-- Maintains normal ping data patterns (except first byte)
-- Uses sequential packet numbering
+**Técnicas de Evasión DPI**:
+- Estructura de encabezado ICMP idéntica al ping legítimo
+- Temporización y tamaño de paquete estándar
+- Mantiene patrones normales de datos ping (excepto primer byte)
+- Usa numeración secuencial de paquetes
 
-### 3. MitM Decoder (`mitm_decoder.py`)
+### 3. Decodificador MitM (`mitm_decoder.py`)
 
-**Purpose**: Intercept ICMP packets and decode hidden Caesar cipher messages by trying all possible shift combinations.
+**Propósito**: Interceptar paquetes ICMP y decodificar mensajes César ocultos probando todas las combinaciones de desplazamiento posibles.
 
-**Usage**:
+**Uso**:
 ```bash
-# Live packet capture (requires root)
+# Captura de paquetes en vivo (requiere root)
 sudo python3 mitm_decoder.py
 
-# Simulation mode with provided encrypted text
-python3 mitm_decoder.py <encrypted_message>
+# Modo simulación con texto cifrado proporcionado
+python3 mitm_decoder.py <mensaje_cifrado>
 ```
 
-**Examples**:
+**Ejemplos**:
 ```bash
-# Analyze encrypted text directly
+# Analizar texto cifrado directamente
 python3 mitm_decoder.py "Khoor Zruog"
 
-# Capture live ICMP packets (requires root)
+# Capturar paquetes ICMP en vivo (requiere root)
 sudo python3 mitm_decoder.py
 ```
 
-**Features**:
-- Tries all 26 possible Caesar cipher shifts (0-25)
-- Intelligent English text detection algorithm
-- Highlights most probable plaintext in green
-- Can capture live ICMP packets or analyze provided text
-- Scores decryptions based on English language patterns
+**Características**:
+- Prueba los 26 posibles desplazamientos de cifrado César (0-25)
+- Algoritmo inteligente de detección de texto en inglés
+- Resalta el texto plano más probable en verde
+- Puede capturar paquetes ICMP en vivo o analizar texto proporcionado
+- Puntúa las decodificaciones basándose en patrones del idioma inglés
 
-**English Detection Algorithm**:
-- Recognizes common English words
-- Analyzes vowel-to-consonant ratios
-- Detects common letter patterns (TH, HE, IN, etc.)
-- Penalizes unusual letter combinations
-- Considers typical English word length distributions
+**Algoritmo de Detección de Inglés**:
+- Reconoce palabras comunes en inglés
+- Analiza proporciones de vocales a consonantes
+- Detecta patrones comunes de letras (TH, HE, IN, etc.)
+- Penaliza combinaciones de letras inusuales
+- Considera distribuciones típicas de longitud de palabras en inglés
 
-## Complete Demonstration
+## Demostración Completa
 
-### Running the Full Demo
+### Ejecutando la Demo Completa
 
 ```bash
 python3 demo.py
 ```
 
-This runs a complete demonstration showing:
-1. Original message encryption
-2. Simulated stealth transmission
-3. MitM attack and decoding
+Esto ejecuta una demostración completa mostrando:
+1. Cifrado del mensaje original
+2. Transmisión stealth simulada
+3. Ataque MitM y decodificación
 
-### Example Workflow
+### Flujo de Trabajo de Ejemplo
 
-1. **Encrypt a message**:
+1. **Cifrar un mensaje**:
    ```bash
    python3 caesar_cipher.py "Secret Data" 7
-   # Output: Zljyla Khah
+   # Salida: Zljyla Khah
    ```
 
-2. **Transmit via stealth ICMP** (simulation):
-   - Each character sent in separate ICMP packet
-   - Packets look identical to normal ping traffic
-   - End marker 'b' signals transmission complete
+2. **Transmitir via ICMP stealth** (simulación):
+   - Cada carácter enviado en paquete ICMP separado
+   - Los paquetes se ven idénticos al tráfico ping normal
+   - El marcador de fin 'b' señala transmisión completa
 
-3. **Intercept and decode**:
+3. **Interceptar y decodificar**:
    ```bash
    python3 mitm_decoder.py "Zljyla Khah"
-   # Tries all shifts, identifies "Secret Data" as most likely plaintext
+   # Prueba todos los desplazamientos, identifica "Secret Data" como texto plano más probable
    ```
 
-## Security Implications
+## Implicaciones de Seguridad
 
-### Attack Scenario
+### Escenario de Ataque
 
-An attacker within a corporate network wants to exfiltrate sensitive data without triggering DPI systems that monitor for suspicious patterns. By using this technique:
+Un atacante dentro de una red corporativa quiere exfiltrar datos sensibles sin activar sistemas DPI que monitorean patrones sospechosos. Usando esta técnica:
 
-1. **Data is encrypted** using Caesar cipher (simple but effective for demonstration)
-2. **Data is hidden** in legitimate-looking ping traffic
-3. **Exfiltration is slow** but undetectable by standard DPI signatures
-4. **External accomplice** can decode the data using the MitM tool
+1. **Los datos son cifrados** usando cifrado César (simple pero efectivo para demostración)
+2. **Los datos se ocultan** en tráfico ping de apariencia legítima
+3. **La exfiltración es lenta** pero indetectable por firmas DPI estándar
+4. **Un cómplice externo** puede decodificar los datos usando la herramienta MitM
 
-### DPI Evasion Techniques Demonstrated
+### Técnicas de Evasión DPI Demostradas
 
-1. **Protocol Mimicry**: ICMP packets are identical to legitimate ping traffic
-2. **Timing Normalization**: 1-second intervals match normal ping behavior
-3. **Size Consistency**: 32-byte data payload matches default ping size
-4. **Header Compliance**: All ICMP headers follow RFC standards
-5. **Pattern Obfuscation**: Only one byte per packet is modified
+1. **Imitación de Protocolo**: Los paquetes ICMP son idénticos al tráfico ping legítimo
+2. **Normalización de Temporización**: Intervalos de 1 segundo coinciden con comportamiento normal de ping
+3. **Consistencia de Tamaño**: Payload de datos de 32 bytes coincide con tamaño predeterminado de ping
+4. **Cumplimiento de Encabezados**: Todos los encabezados ICMP siguen estándares RFC
+5. **Ofuscación de Patrones**: Solo un byte por paquete es modificado
 
-### Defensive Countermeasures
+### Contramedidas Defensivas
 
-1. **Deep Content Inspection**: Analyze ICMP data patterns for anomalies
-2. **Behavioral Analysis**: Monitor for unusual ping patterns or destinations
-3. **Statistical Analysis**: Look for non-random data in ICMP payloads
-4. **Network Segmentation**: Restrict ICMP traffic between network segments
-5. **Encryption Detection**: Use entropy analysis to detect encrypted content
+1. **Inspección Profunda de Contenido**: Analizar patrones de datos ICMP para anomalías
+2. **Análisis Comportamental**: Monitorear patrones de ping inusuales o destinos
+3. **Análisis Estadístico**: Buscar datos no aleatorios en payloads ICMP
+4. **Segmentación de Red**: Restringir tráfico ICMP entre segmentos de red
+5. **Detección de Cifrado**: Usar análisis de entropía para detectar contenido cifrado
 
-## Technical Requirements
+## Requisitos Técnicos
 
-### Dependencies
+### Dependencias
 - Python 3.x
-- Root privileges (for raw socket operations in stealth_ping.py and live capture in mitm_decoder.py)
+- Privilegios de root (para operaciones de socket raw en stealth_ping.py y captura en vivo en mitm_decoder.py)
 
-### Supported Platforms
-- Linux (tested)
-- macOS (should work with root privileges)
-- Windows (requires modifications for raw socket handling)
+### Plataformas Soportadas
+- Linux (probado)
+- macOS (debería funcionar con privilegios de root)
+- Windows (requiere modificaciones para manejo de socket raw)
 
-## Files Structure
+## Estructura de Archivos
 
 ```
 Lab1Sec3/
-├── Informe_Laboratorio_1__2025___Sem_2_.pdf  # Original lab requirements
-├── caesar_cipher.py                          # Activity 1: Encryption
-├── stealth_ping.py                          # Activity 2: Stealth transmission
-├── mitm_decoder.py                          # Activity 3: MitM attack
-├── demo.py                                  # Complete demonstration
-└── README.md                                # This documentation
+├── Informe_Laboratorio_1__2025___Sem_2_.pdf  # Requisitos originales del laboratorio
+├── caesar_cipher.py                          # Actividad 1: Cifrado
+├── stealth_ping.py                          # Actividad 2: Transmisión stealth
+├── mitm_decoder.py                          # Actividad 3: Ataque MitM
+├── demo.py                                  # Demostración completa
+└── README.md                                # Esta documentación
 ```
 
-## Lab Report Requirements
+## Requisitos del Informe de Laboratorio
 
-As specified in the PDF, this implementation addresses:
+Como se especifica en el PDF, esta implementación aborda:
 
-1. **Activity 1**: ✅ Caesar cipher encryption with configurable shift
-2. **Activity 2**: ✅ Stealth ICMP transmission (one character per packet)
-3. **Activity 3**: ✅ MitM attack with brute-force Caesar decoding
+1. **Actividad 1**: ✅ Cifrado César con desplazamiento configurable
+2. **Actividad 2**: ✅ Transmisión ICMP stealth (un carácter por paquete)
+3. **Actividad 3**: ✅ Ataque MitM con decodificación César por fuerza bruta
 
-The implementation demonstrates that while DPI systems can detect obvious data exfiltration attempts, carefully crafted traffic that mimics legitimate protocols can potentially bypass detection mechanisms.
+La implementación demuestra que mientras los sistemas DPI pueden detectar intentos obvios de exfiltración de datos, el tráfico cuidadosamente elaborado que imita protocolos legítimos puede potencialmente evadir mecanismos de detección.
 
-## Ethical Considerations
+## Consideraciones Éticas
 
-This code is provided for educational purposes only. The techniques demonstrated should only be used in authorized penetration testing or educational environments. Unauthorized use of these techniques for data exfiltration is illegal and unethical.
+Este código se proporciona únicamente con fines educativos. Las técnicas demostradas solo deben utilizarse en pruebas de penetración autorizadas o entornos educativos. El uso no autorizado de estas técnicas para exfiltración de datos es ilegal y poco ético.
 
-## Future Enhancements
+## Mejoras Futuras
 
-1. **Advanced Encryption**: Implement stronger encryption algorithms
-2. **Multiple Protocols**: Extend to other protocols (DNS, HTTP, etc.)
-3. **Error Correction**: Add checksums and redundancy for reliable transmission
-4. **Adaptive Timing**: Vary transmission intervals to avoid pattern detection
-5. **Steganography**: Hide data in packet headers rather than payload
+1. **Cifrado Avanzado**: Implementar algoritmos de cifrado más fuertes
+2. **Múltiples Protocolos**: Extender a otros protocolos (DNS, HTTP, etc.)
+3. **Corrección de Errores**: Agregar checksums y redundancia para transmisión confiable
+4. **Temporización Adaptativa**: Variar intervalos de transmisión para evitar detección de patrones
+5. **Esteganografía**: Ocultar datos en encabezados de paquetes en lugar del payload
