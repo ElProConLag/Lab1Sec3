@@ -9,7 +9,7 @@ Este laboratorio demuestra cómo los atacantes pueden evadir los sistemas de Ins
 El objetivo es auditar si los sistemas DPI pueden detectar efectivamente la exfiltración de datos a través del tráfico de red mediante:
 
 1. Creación de un algoritmo de cifrado César
-2. Implementación de transmisión stealth de datos via paquetes ICMP
+2. Implementación de transmisión stealth de datos vía paquetes ICMP
 3. Demostración de un ataque Man-in-the-Middle (MitM) para interceptar y decodificar mensajes ocultos
 
 ## Programas Implementados
