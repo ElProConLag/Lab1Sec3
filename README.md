@@ -40,7 +40,7 @@ python3 caesar_cipher.py "Hello World" 3
 
 **Uso**:
 ```bash
-sudo python3 stealth_ping.py <host_objetivo> <mensaje_cifrado>
+sudo python3 stealth_ping.py <target_host> <encrypted_message>
 ```
 
 **Ejemplo**:
