@@ -13,6 +13,9 @@ import subprocess
 import sys
 import os
 
+# Module-level constant for script directory
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 def run_demo():
     """Run the complete cybersecurity lab demonstration."""
@@ -21,9 +24,6 @@ def run_demo():
     print("Deep Packet Inspection (DPI) Evasion via ICMP Stealth Mode")
     print("Unicode Support Enabled")
     print("=" * 70)
-    
-    # Get the directory where this script is located
-    script_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Demo message with Unicode
     original_message = "Secret 世界"  # "Secret World" in Chinese
@@ -40,7 +40,7 @@ def run_demo():
     
     result = subprocess.run([
         'python3', 'caesar_cipher.py', original_message, str(shift_value)
-    ], capture_output=True, text=True, cwd=script_dir)
+    ], capture_output=True, text=True, cwd=SCRIPT_DIR)
     
     if result.returncode == 0:
         print(result.stdout)
@@ -89,7 +89,7 @@ def run_demo():
     
     result = subprocess.run([
         'python3', 'mitm_decoder.py', encrypted_message
-    ], capture_output=True, text=True, cwd=script_dir)
+    ], capture_output=True, text=True, cwd=SCRIPT_DIR)
     
     if result.returncode == 0:
         print(result.stdout)
@@ -106,7 +106,7 @@ def run_demo():
     
     result = subprocess.run([
         'python3', 'caesar_cipher.py', ascii_message, "3"
-    ], capture_output=True, text=True, cwd=script_dir)
+    ], capture_output=True, text=True, cwd=SCRIPT_DIR)
     
     if result.returncode == 0:
         ascii_encrypted = result.stdout.strip().split('\n')[-1]
@@ -114,7 +114,7 @@ def run_demo():
         
         result = subprocess.run([
             'python3', 'mitm_decoder.py', ascii_encrypted
-        ], capture_output=True, text=True, cwd=script_dir)
+        ], capture_output=True, text=True, cwd=SCRIPT_DIR)
         
         if result.returncode == 0:
             # Extract just the result line
@@ -142,7 +142,7 @@ def run_demo():
 def main():
     """Main function."""
     # Check if we're in the correct directory
-    if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'caesar_cipher.py')):
+    if not os.path.exists(os.path.join(SCRIPT_DIR, 'caesar_cipher.py')):
         print("Error: Lab files not found. Please run from the correct directory.")
         sys.exit(1)
     
