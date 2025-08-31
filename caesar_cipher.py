@@ -50,6 +50,11 @@ def load_dictionary_from_file(filename):
 SPANISH_DICTIONARY = load_dictionary_from_file('spanish_dictionary.txt')
 ENGLISH_DICTIONARY = load_dictionary_from_file('english_dictionary.txt')
 
+# ANSI color codes for terminal output
+GREEN = '\033[92m'  # Green color
+YELLOW = '\033[93m' # Yellow color
+RESET = '\033[0m'   # Reset color
+
 
 def caesar_encrypt(text, shift):
     """
@@ -282,11 +287,6 @@ def analyze_with_language_detection(encrypted_message):
     print(f"\nAnalyzing encrypted message: '{encrypted_message}'")
     print("\nTrying all possible Caesar cipher shifts:")
     print("=" * 80)
-    
-    # Colors for terminal output
-    GREEN = '\033[92m'  # Green color
-    YELLOW = '\033[93m' # Yellow color
-    RESET = '\033[0m'   # Reset color
     
     best_spanish_score = float('-inf')
     best_spanish_shift = 0
