@@ -22,6 +22,9 @@ def run_demo():
     print("Unicode Support Enabled")
     print("=" * 70)
     
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
     # Demo message with Unicode
     original_message = "Secret 世界"  # "Secret World" in Chinese
     shift_value = 7
@@ -37,7 +40,7 @@ def run_demo():
     
     result = subprocess.run([
         'python3', 'caesar_cipher.py', original_message, str(shift_value)
-    ], capture_output=True, text=True, cwd='/home/runner/work/Lab1Sec3/Lab1Sec3')
+    ], capture_output=True, text=True, cwd=script_dir)
     
     if result.returncode == 0:
         print(result.stdout)
@@ -86,7 +89,7 @@ def run_demo():
     
     result = subprocess.run([
         'python3', 'mitm_decoder.py', encrypted_message
-    ], capture_output=True, text=True, cwd='/home/runner/work/Lab1Sec3/Lab1Sec3')
+    ], capture_output=True, text=True, cwd=script_dir)
     
     if result.returncode == 0:
         print(result.stdout)
@@ -103,7 +106,7 @@ def run_demo():
     
     result = subprocess.run([
         'python3', 'caesar_cipher.py', ascii_message, "3"
-    ], capture_output=True, text=True, cwd='/home/runner/work/Lab1Sec3/Lab1Sec3')
+    ], capture_output=True, text=True, cwd=script_dir)
     
     if result.returncode == 0:
         ascii_encrypted = result.stdout.strip().split('\n')[-1]
@@ -111,7 +114,7 @@ def run_demo():
         
         result = subprocess.run([
             'python3', 'mitm_decoder.py', ascii_encrypted
-        ], capture_output=True, text=True, cwd='/home/runner/work/Lab1Sec3/Lab1Sec3')
+        ], capture_output=True, text=True, cwd=script_dir)
         
         if result.returncode == 0:
             # Extract just the result line
