@@ -21,6 +21,17 @@ SPANISH_DICTIONARY = [
     'ATAQUE', 'CIFRADO', 'CLAVE', 'SEGURIDAD', 'RED', 'PAQUETE', 'DATOS', 'INFORMACIÓN'
 ]
 
+# English dictionary for language detection
+ENGLISH_DICTIONARY = [
+    'HELLO', 'WORLD', 'THE', 'AND', 'FOR', 'ARE', 'BUT', 'NOT', 'YOU', 'ALL', 
+    'CAN', 'HER', 'WAS', 'ONE', 'OUR', 'HAD', 'HAVE', 'SECRET', 'MESSAGE',
+    'THIS', 'THAT', 'WITH', 'WILL', 'FROM', 'THEY', 'KNOW', 'ATTACK',
+    'WANT', 'BEEN', 'GOOD', 'MUCH', 'SOME', 'TIME', 'VERY', 'DATA',
+    'WHEN', 'COME', 'HERE', 'HOW', 'JUST', 'LIKE', 'LONG', 'PING',
+    'MAKE', 'MANY', 'OVER', 'SUCH', 'TAKE', 'THAN', 'THEM', 'ICMP',
+    'WELL', 'WERE', 'PACKET', 'NETWORK', 'SECURITY', 'CIPHER', 'KEY'
+]
+
 
 def caesar_encrypt(text, shift):
     """
@@ -190,13 +201,7 @@ def calculate_english_score(text):
     score = 0
     
     # Check for common English words (case-insensitive)
-    common_words = ['HELLO', 'WORLD', 'THE', 'AND', 'FOR', 'ARE', 'BUT', 'NOT', 'YOU', 'ALL', 
-                   'CAN', 'HER', 'WAS', 'ONE', 'OUR', 'HAD', 'HAVE', 'SECRET', 'MESSAGE',
-                   'THIS', 'THAT', 'WITH', 'WILL', 'FROM', 'THEY', 'KNOW', 'ATTACK',
-                   'WANT', 'BEEN', 'GOOD', 'MUCH', 'SOME', 'TIME', 'VERY', 'DATA',
-                   'WHEN', 'COME', 'HERE', 'HOW', 'JUST', 'LIKE', 'LONG', 'PING',
-                   'MAKE', 'MANY', 'OVER', 'SUCH', 'TAKE', 'THAN', 'THEM', 'ICMP',
-                   'WELL', 'WERE', 'PACKET', 'NETWORK', 'SECURITY', 'CIPHER', 'KEY']
+    common_words = ENGLISH_DICTIONARY
     
     # Split by spaces and check each word
     words = text.upper().split()
