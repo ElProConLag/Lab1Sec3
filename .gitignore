@@ -1,5 +1,4 @@
 __pycache__/
-validate_functionality.py
 *.log
 *.aux
 *.toc
