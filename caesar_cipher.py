@@ -94,8 +94,7 @@ def calculate_spanish_score(text):
     # Check for common Spanish words (case-insensitive)
     common_words = ['HOLA', 'MUNDO', 'EL', 'LA', 'DE', 'QUE', 'Y', 'A', 'EN', 'UN', 'ES', 'SE', 'NO', 'TE', 'LO',
                    'LE', 'DA', 'SU', 'POR', 'SON', 'CON', 'PARA', 'COMO', 'ESTA', 'ESTÁ', 'TU', 'PERO', 'MAS', 'MÁS',
-                   'ESTE', 'ESTOS', 'TODO', 'BIEN', 'PUEDE', 'VER', 'MUY', 'MI', 'TIEMPO', 'HACER', 'QUIEN', 'SERÁ',
-                   'ESTE', 'UNA', 'TIENE', 'ME', 'AHORA', 'PRIMER', 'TRES', 'AÑOS', 'MUCHO', 'PORQUE', 'CADA',
+                   'UNA', 'TIENE', 'ME', 'AHORA', 'PRIMER', 'TRES', 'AÑOS', 'MUCHO', 'PORQUE', 'CADA',
                    'CASA', 'VIDA', 'OTROS', 'NUEVO', 'MISMO', 'DESPUÉS', 'HASTA', 'DONDE', 'OTRA', 'CUANDO',
                    'AQUÍ', 'SOLO', 'SIN', 'ENTRE', 'FORMA', 'PAÍS', 'GOBIERNO', 'POLÍTICA', 'PERSONA', 'GRUPO',
                    'TRABAJO', 'LUGAR', 'MOMENTO', 'AGUA', 'MANO', 'PARTE', 'DÍA', 'NOCHE', 'MENSAJE', 'SECRETO',
