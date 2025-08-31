@@ -8,29 +8,47 @@ This program implements the Caesar cipher algorithm to encrypt text using a spec
 """
 
 import sys
+import os
 
 
-# Spanish dictionary for language detection
-SPANISH_DICTIONARY = [
-    'HOLA', 'MUNDO', 'EL', 'LA', 'DE', 'QUE', 'Y', 'A', 'EN', 'UN', 'ES', 'SE', 'NO', 'TE', 'LO',
-    'LE', 'DA', 'SU', 'POR', 'SON', 'CON', 'PARA', 'COMO', 'ESTA', 'ESTÁ', 'TU', 'PERO', 'MAS', 'MÁS',
-    'UNA', 'TIENE', 'ME', 'AHORA', 'PRIMER', 'TRES', 'AÑOS', 'MUCHO', 'PORQUE', 'CADA',
-    'CASA', 'VIDA', 'OTROS', 'NUEVO', 'MISMO', 'DESPUÉS', 'HASTA', 'DONDE', 'OTRA', 'CUANDO',
-    'AQUÍ', 'SOLO', 'SIN', 'ENTRE', 'FORMA', 'PAÍS', 'GOBIERNO', 'POLÍTICA', 'PERSONA', 'GRUPO',
-    'TRABAJO', 'LUGAR', 'MOMENTO', 'AGUA', 'MANO', 'PARTE', 'DÍA', 'NOCHE', 'MENSAJE', 'SECRETO',
-    'ATAQUE', 'CIFRADO', 'CLAVE', 'SEGURIDAD', 'RED', 'PAQUETE', 'DATOS', 'INFORMACIÓN'
-]
+def load_dictionary_from_file(filename):
+    """
+    Load dictionary words from a text file.
+    
+    Args:
+        filename (str): Path to the dictionary file
+        
+    Returns:
+        list: List of uppercase words from the file
+    """
+    words = []
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, filename)
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            for line in file:
+                line = line.strip()
+                # Skip comments and empty lines
+                if line and not line.startswith('#'):
+                    words.append(line.upper())
+    except FileNotFoundError:
+        print(f"Warning: Dictionary file '{filename}' not found. Using fallback words.", file=sys.stderr)
+        # Fallback to minimal dictionary if file is not found
+        if 'spanish' in filename.lower():
+            words = ['HOLA', 'MUNDO', 'MENSAJE', 'SECRETO', 'CIFRADO', 'SEGURIDAD']
+        else:
+            words = ['HELLO', 'WORLD', 'MESSAGE', 'SECRET', 'CIPHER', 'SECURITY']
+    except Exception as e:
+        print(f"Error loading dictionary '{filename}': {e}", file=sys.stderr)
+        words = []
+    
+    return words
 
-# English dictionary for language detection
-ENGLISH_DICTIONARY = [
-    'HELLO', 'WORLD', 'THE', 'AND', 'FOR', 'ARE', 'BUT', 'NOT', 'YOU', 'ALL', 
-    'CAN', 'HER', 'WAS', 'ONE', 'OUR', 'HAD', 'HAVE', 'SECRET', 'MESSAGE',
-    'THIS', 'THAT', 'WITH', 'WILL', 'FROM', 'THEY', 'KNOW', 'ATTACK',
-    'WANT', 'BEEN', 'GOOD', 'MUCH', 'SOME', 'TIME', 'VERY', 'DATA',
-    'WHEN', 'COME', 'HERE', 'HOW', 'JUST', 'LIKE', 'LONG', 'PING',
-    'MAKE', 'MANY', 'OVER', 'SUCH', 'TAKE', 'THAN', 'THEM', 'ICMP',
-    'WELL', 'WERE', 'PACKET', 'NETWORK', 'SECURITY', 'CIPHER', 'KEY'
-]
+
+# Load dictionaries from external files
+SPANISH_DICTIONARY = load_dictionary_from_file('spanish_dictionary.txt')
+ENGLISH_DICTIONARY = load_dictionary_from_file('english_dictionary.txt')
 
 
 def caesar_encrypt(text, shift):
