@@ -53,7 +53,7 @@ def caesar_decrypt(text, shift):
     Returns:
         str: The decrypted text with Unicode characters preserved
     """
-    decrypted_text = ""
+    decrypted_chars = []
     
     for char in text:
         # Only apply Caesar cipher to ASCII letters, preserve all other characters including Unicode
@@ -64,12 +64,12 @@ def caesar_decrypt(text, shift):
             # Handle lowercase letters
             else:
                 decrypted_char = chr((ord(char) - ord('a') - shift) % 26 + ord('a'))
-            decrypted_text += decrypted_char
+            decrypted_chars.append(decrypted_char)
         else:
             # Non-ASCII alphabetic characters and all other characters remain unchanged
-            decrypted_text += char
+            decrypted_chars.append(char)
     
-    return decrypted_text
+    return "".join(decrypted_chars)
 
 
 def calculate_spanish_score(text):
