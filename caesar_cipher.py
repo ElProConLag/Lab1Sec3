@@ -114,8 +114,8 @@ def calculate_spanish_score(text):
         score += 10  # LL is common in Spanish
     if 'RR' in clean_text:
         score += 10  # RR is distinctive in Spanish
-    if 'Ñ' in clean_text or 'N' in clean_text:
-        score += 5   # Ñ or patterns suggesting it
+    if 'Ñ' in clean_text:
+        score += 5   # Ñ is a strong indicator
     if 'CH' in clean_text:
         score += 8   # CH is common in Spanish
     
