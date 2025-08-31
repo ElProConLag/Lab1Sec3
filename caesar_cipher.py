@@ -10,6 +10,18 @@ This program implements the Caesar cipher algorithm to encrypt text using a spec
 import sys
 
 
+# Spanish dictionary for language detection
+SPANISH_DICTIONARY = [
+    'HOLA', 'MUNDO', 'EL', 'LA', 'DE', 'QUE', 'Y', 'A', 'EN', 'UN', 'ES', 'SE', 'NO', 'TE', 'LO',
+    'LE', 'DA', 'SU', 'POR', 'SON', 'CON', 'PARA', 'COMO', 'ESTA', 'ESTÁ', 'TU', 'PERO', 'MAS', 'MÁS',
+    'UNA', 'TIENE', 'ME', 'AHORA', 'PRIMER', 'TRES', 'AÑOS', 'MUCHO', 'PORQUE', 'CADA',
+    'CASA', 'VIDA', 'OTROS', 'NUEVO', 'MISMO', 'DESPUÉS', 'HASTA', 'DONDE', 'OTRA', 'CUANDO',
+    'AQUÍ', 'SOLO', 'SIN', 'ENTRE', 'FORMA', 'PAÍS', 'GOBIERNO', 'POLÍTICA', 'PERSONA', 'GRUPO',
+    'TRABAJO', 'LUGAR', 'MOMENTO', 'AGUA', 'MANO', 'PARTE', 'DÍA', 'NOCHE', 'MENSAJE', 'SECRETO',
+    'ATAQUE', 'CIFRADO', 'CLAVE', 'SEGURIDAD', 'RED', 'PAQUETE', 'DATOS', 'INFORMACIÓN'
+]
+
+
 def caesar_encrypt(text, shift):
     """
     Encrypt text using Caesar cipher with the given shift value.
@@ -92,13 +104,7 @@ def calculate_spanish_score(text):
     score = 0
     
     # Check for common Spanish words (case-insensitive)
-    common_words = ['HOLA', 'MUNDO', 'EL', 'LA', 'DE', 'QUE', 'Y', 'A', 'EN', 'UN', 'ES', 'SE', 'NO', 'TE', 'LO',
-                   'LE', 'DA', 'SU', 'POR', 'SON', 'CON', 'PARA', 'COMO', 'ESTA', 'ESTÁ', 'TU', 'PERO', 'MAS', 'MÁS',
-                   'UNA', 'TIENE', 'ME', 'AHORA', 'PRIMER', 'TRES', 'AÑOS', 'MUCHO', 'PORQUE', 'CADA',
-                   'CASA', 'VIDA', 'OTROS', 'NUEVO', 'MISMO', 'DESPUÉS', 'HASTA', 'DONDE', 'OTRA', 'CUANDO',
-                   'AQUÍ', 'SOLO', 'SIN', 'ENTRE', 'FORMA', 'PAÍS', 'GOBIERNO', 'POLÍTICA', 'PERSONA', 'GRUPO',
-                   'TRABAJO', 'LUGAR', 'MOMENTO', 'AGUA', 'MANO', 'PARTE', 'DÍA', 'NOCHE', 'MENSAJE', 'SECRETO',
-                   'ATAQUE', 'CIFRADO', 'CLAVE', 'SEGURIDAD', 'RED', 'PAQUETE', 'DATOS', 'INFORMACIÓN']
+    common_words = SPANISH_DICTIONARY
     
     # Split by spaces and check each word
     words = text.upper().split()
