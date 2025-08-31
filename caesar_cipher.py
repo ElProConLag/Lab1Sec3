@@ -169,12 +169,11 @@ def calculate_spanish_score(text):
     consonants = len(clean_text) - vowels
     
     # Spanish typically has a higher vowel ratio than English (40-50%)
-    if len(clean_text) > 0:
-        vowel_ratio = vowels / len(clean_text)
-        if 0.40 <= vowel_ratio <= 0.55:
-            score += 25
-        elif 0.35 <= vowel_ratio <= 0.60:
-            score += 15
+    vowel_ratio = vowels / len(clean_text)
+    if 0.40 <= vowel_ratio <= 0.55:
+        score += 25
+    elif 0.35 <= vowel_ratio <= 0.60:
+        score += 15
     
     # Check for Spanish-specific letter frequency patterns
     # Spanish has high frequency of A, E, O
@@ -182,17 +181,16 @@ def calculate_spanish_score(text):
     e_count = clean_text.count('E')
     o_count = clean_text.count('O')
     
-    if len(clean_text) > 0:
-        a_freq = a_count / len(clean_text)
-        e_freq = e_count / len(clean_text)
-        o_freq = o_count / len(clean_text)
-        
-        if a_freq > 0.11:  # Spanish has high A frequency
-            score += 10
-        if e_freq > 0.12:  # Spanish has high E frequency
-            score += 10
-        if o_freq > 0.08:  # Spanish has moderate O frequency
-            score += 8
+    a_freq = a_count / len(clean_text)
+    e_freq = e_count / len(clean_text)
+    o_freq = o_count / len(clean_text)
+    
+    if a_freq > 0.11:  # Spanish has high A frequency
+        score += 10
+    if e_freq > 0.12:  # Spanish has high E frequency
+        score += 10
+    if o_freq > 0.08:  # Spanish has moderate O frequency
+        score += 8
     
     # Penalize letter combinations that are unusual in Spanish
     unusual_patterns = ['KK', 'WW', 'ZZ', 'XX', 'QQ']
