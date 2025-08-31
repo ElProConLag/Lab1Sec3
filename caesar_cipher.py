@@ -9,6 +9,7 @@ This program implements the Caesar cipher algorithm to encrypt text using a spec
 
 import sys
 import os
+import argparse
 
 
 def load_dictionary_from_file(filename):
@@ -142,8 +143,12 @@ def calculate_spanish_score(text):
     
     # Split by spaces and check each word
     words = text.upper().split()
+    cleaned_words = []
     for word in words:
         word_clean = ''.join(char for char in word if char.isalpha())
+        if not word_clean:
+            continue
+        cleaned_words.append(word_clean)
         if word_clean in common_words:
             score += 50  # High bonus for common Spanish words
     
@@ -196,8 +201,8 @@ def calculate_spanish_score(text):
             score -= 15
     
     # Check for reasonable word length distribution
-    if words:
-        avg_word_length = sum(len(''.join(char for char in word if char.isalpha())) for word in words) / len(words)
+    if cleaned_words:
+        avg_word_length = sum(len(w) for w in cleaned_words) / len(cleaned_words)
         if 4 <= avg_word_length <= 8:  # Typical Spanish word lengths
             score += 10
     
@@ -228,8 +233,12 @@ def calculate_english_score(text):
     
     # Split by spaces and check each word
     words = text.upper().split()
+    cleaned_words = []
     for word in words:
         word_clean = ''.join(char for char in word if char.isalpha())
+        if not word_clean:
+            continue
+        cleaned_words.append(word_clean)
         if word_clean in common_words:
             score += 50  # High bonus for common English words
     
@@ -262,8 +271,8 @@ def calculate_english_score(text):
             score -= 20
     
     # Check for reasonable word length distribution
-    if words:
-        avg_word_length = sum(len(''.join(char for char in word if char.isalpha())) for word in words) / len(words)
+    if cleaned_words:
+        avg_word_length = sum(len(w) for w in cleaned_words) / len(cleaned_words)
         if 3 <= avg_word_length <= 7:  # Typical English word lengths
             score += 10
     
@@ -355,25 +364,35 @@ def analyze_with_language_detection(encrypted_message):
 
 def main():
     """Main function to handle command line arguments and execute encryption or decryption."""
-    if len(sys.argv) < 2:
-        print("Usage:")
-        print("  Encrypt: python3 caesar_cipher.py <text_to_encrypt> <shift_value>")
-        print("  Decrypt: python3 caesar_cipher.py --decrypt <encrypted_text>")
-        print("  Analyze: python3 caesar_cipher.py --analyze <encrypted_text>")
-        print("\nExamples:")
-        print("  python3 caesar_cipher.py 'Hello World' 3")
-        print("  python3 caesar_cipher.py --decrypt 'Khoor Zruog'")
-        print("  python3 caesar_cipher.py --analyze 'Krod pxqgr'")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Caesar Cipher Implementation - encrypts, decrypts, or analyzes Caesar-ciphered text.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s "Hello World" 3              # Encrypt text with shift 3
+  %(prog)s --decrypt "Khoor Zruog"      # Decrypt and show all possibilities
+  %(prog)s --analyze "Krod pxqgr"       # Analyze with language detection
+        """
+    )
+    
+    # Create mutually exclusive group for the three main modes
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('text', nargs='?', help='Text to encrypt (requires shift argument)')
+    group.add_argument('--decrypt', dest='decrypt_text', metavar='TEXT', 
+                      help='Text to decrypt (shows all possible shifts)')
+    group.add_argument('--analyze', dest='analyze_text', metavar='TEXT',
+                      help='Text to analyze for language detection')
+    
+    # Shift argument for encryption mode
+    parser.add_argument('shift', nargs='?', type=int, 
+                       help='Shift value for encryption (required when encrypting)')
     
     try:
-        # Check for decrypt mode
-        if sys.argv[1] == "--decrypt":
-            if len(sys.argv) != 3:
-                print("Usage for decrypt: python3 caesar_cipher.py --decrypt <encrypted_text>")
-                sys.exit(1)
-            
-            encrypted_text = sys.argv[2]
+        args = parser.parse_args()
+        
+        # Decrypt mode
+        if args.decrypt_text:
+            encrypted_text = args.decrypt_text
             print(f"Encrypted text: {encrypted_text}", file=sys.stderr)
             
             # Try all shifts and show all possibilities
@@ -384,24 +403,19 @@ def main():
             
             return
         
-        # Check for analyze mode (with language detection)
-        elif sys.argv[1] == "--analyze":
-            if len(sys.argv) != 3:
-                print("Usage for analyze: python3 caesar_cipher.py --analyze <encrypted_text>")
-                sys.exit(1)
-            
-            encrypted_text = sys.argv[2]
+        # Analyze mode (with language detection)
+        elif args.analyze_text:
+            encrypted_text = args.analyze_text
             analyze_with_language_detection(encrypted_text)
             return
         
-        # Default encryption mode
-        else:
-            if len(sys.argv) != 3:
-                print("Usage for encrypt: python3 caesar_cipher.py <text_to_encrypt> <shift_value>")
-                sys.exit(1)
+        # Encryption mode (default)
+        elif args.text:
+            if args.shift is None:
+                parser.error("Shift value is required when encrypting text")
             
-            text_to_encrypt = sys.argv[1]
-            shift_value = int(sys.argv[2])
+            text_to_encrypt = args.text
+            shift_value = args.shift
             
             print(f"Original text: {text_to_encrypt}", file=sys.stderr)
             print(f"Shift value: {shift_value}", file=sys.stderr)
@@ -411,12 +425,14 @@ def main():
             
             return encrypted_text
         
-    except ValueError:
-        print("Error: Shift value must be an integer")
-        sys.exit(1)
+        else:
+            parser.print_help()
+            sys.exit(1)
+            
+    except ValueError as e:
+        parser.error(f"Shift value must be an integer: {e}")
     except Exception as e:
-        print(f"Error: {e}")
-        sys.exit(1)
+        parser.error(f"Error: {e}")
 
 
 if __name__ == "__main__":
