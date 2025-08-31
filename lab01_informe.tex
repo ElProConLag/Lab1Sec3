@@ -13,8 +13,10 @@
 \usepackage{multirow}
 \usepackage[utf8]{inputenc}
 \usepackage{float}
+\usepackage{enumitem}
 
 \renewcommand{\tablename}{Tabla}
+\setlist{itemsep=5pt}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 
@@ -39,13 +41,9 @@
 
 \begin{enumerate}
     \item  Usted empieza a trabajar en una empresa tecnológica que se jacta de poseer sistemas que permiten identificar filtraciones de información a través de Deep Packet Inspection (DPI).
-    
     A usted le han encomendado auditar si efectivamente estos sistemas son capaces de detectar las filtraciones a través de tráfico de red. Debido a que el programa ping es ampliamente utilizado desde dentro y hacia fuera de la empresa, su tarea será crear un software que permita replicar tráfico generado por el programa ping con su configuración por defecto, pero con fragmentos de información confidencial. Recuerde que al comparar tráfico real con el generado no debe gatillar alarmas.
-    
     De todas formas, deberá hacer una prueba de concepto, en la cual se demuestre que al conocer el algoritmo, será fácil determinar el mensaje en claro.
-    
     Para los pasos 1,2,3 indicar el texto entregado a IA Generativa y validar si el código resultante cumple con lo requerido.
-
 \end{enumerate}
 
 
@@ -115,21 +113,14 @@ Para la primera actividad se desarrolló un programa en Python3 que implementa e
 \textbf{Características implementadas:}
 \begin{itemize}
     \item Cifrado César con desplazamiento configurable (0-25)
-    
     \item Preservación de caracteres no alfabéticos (espacios, puntuación, números)
-    
     \item Soporte para caracteres Unicode
-    
     \item Modo de análisis automático que prueba todos los desplazamientos posibles
-    
     \item Detección inteligente de idioma (español e inglés) basada en:
     \begin{itemize}
         \item Diccionarios de palabras comunes
-        
         \item Análisis de patrones de letras característicos
-        
         \item Proporción de vocales y consonantes
-        
         \item Frecuencia de letras específicas del idioma
     \end{itemize}
 \end{itemize}
@@ -160,15 +151,10 @@ La segunda actividad consistió en desarrollar un programa que permite la transm
 \textbf{Técnicas de evasión DPI implementadas:}
 \begin{itemize}
     \item \textbf{Imitación de protocolo:} Estructura ICMP idéntica al ping estándar
-    
     \item \textbf{Temporización normal:} Intervalos de 1 segundo entre paquetes
-    
     \item \textbf{Tamaño estándar:} Payload de 32 bytes como ping predeterminado
-    
     \item \textbf{Identificadores legítimos:} Uso del PID como identificador de paquete
-    
     \item \textbf{Secuenciación normal:} Numeración secuencial de paquetes
-    
     \item \textbf{Patrón de datos estándar:} Solo el primer byte contiene datos útiles
 \end{itemize}
 
@@ -179,9 +165,7 @@ El programa maneja caracteres Unicode codificándolos en UTF-8 y enviando cada b
 Para el mensaje cifrado "Zljyla 世界":
 \begin{itemize}
     \item 13 bytes UTF-8 = 13 paquetes ICMP
-    
     \item Paquete final con marcador de fin (byte 255)
-    
     \item Total: 14 paquetes que parecen ping normal
 \end{itemize}
 
@@ -199,22 +183,15 @@ La tercera actividad desarrolló un programa capaz de interceptar y decodificar 
 \textbf{Funcionalidades implementadas:}
 \begin{itemize}
     \item \textbf{Captura en vivo:} Interceptación de paquetes ICMP usando raw sockets
-    
     \item \textbf{Reconstrucción de mensajes:} Ensamblado de bytes individuales en texto UTF-8
-    
     \item \textbf{Análisis por fuerza bruta:} Prueba de los 26 desplazamientos César
-    
     \item \textbf{Detección inteligente:} Algoritmo de puntuación para identificar texto en inglés:
     \begin{itemize}
         \item Reconocimiento de palabras comunes
-        
         \item Análisis de proporción vocales/consonantes
-        
         \item Detección de patrones de letras típicos
-        
         \item Penalización de combinaciones inusuales
     \end{itemize}
-    
     \item \textbf{Presentación visual:} Resultado más probable resaltado en verde
 \end{itemize}
 
@@ -229,8 +206,6 @@ English likelihood score: 60.00
 El programa demuestra la vulnerabilidad del cifrado César cuando se conoce el método, identificando correctamente el texto plano incluso sin conocer el desplazamiento utilizado.
 
 
-% Please add the following required packages to your document preamble:
-%\begin{table}[htbp]
 
 \section*{Conclusiones y comentarios}
 
@@ -240,9 +215,7 @@ El laboratorio demostró exitosamente que es posible evadir sistemas de Deep Pac
 
 \begin{itemize}
     \item \textbf{Mimetismo de protocolo:} Los paquetes ICMP generados son indistinguibles del tráfico ping normal en estructura, temporización y tamaño
-    
     \item \textbf{Fragmentación de datos:} Al enviar solo un byte por paquete, se evita la detección de patrones sospechosos en el payload
-    
     \item \textbf{Comportamiento normal:} El uso de identificadores legítimos y secuenciación estándar hace que el tráfico pase desapercibido
 \end{itemize}
 
@@ -251,18 +224,14 @@ El laboratorio demostró exitosamente que es posible evadir sistemas de Deep Pac
 \subsubsection*{Desde la perspectiva del atacante:}
 \begin{itemize}
     \item La técnica permite exfiltración de datos lenta pero indetectable
-    
     \item El soporte Unicode amplía las posibilidades de comunicación encubierta
-    
     \item La simplicidad del método lo hace accesible incluso para atacantes con conocimientos básicos
 \end{itemize}
 
 \subsubsection*{Desde la perspectiva defensiva:}
 \begin{itemize}
     \item Los sistemas DPI tradicionales basados en firmas son insuficientes contra estas técnicas
-    
     \item Se requiere análisis comportamental y estadístico del tráfico de red
-    
     \item La monitorización de patrones de ping anómalos puede revelar actividad sospechosa
 \end{itemize}
 
@@ -270,11 +239,8 @@ El laboratorio demostró exitosamente que es posible evadir sistemas de Deep Pac
 
 \begin{enumerate}
     \item \textbf{Velocidad de transmisión:} La técnica es extremadamente lenta (1 byte/segundo)
-    
     \item \textbf{Cifrado débil:} El cifrado César es vulnerable a ataques de fuerza bruta
-    
     \item \textbf{Detección estadística:} Análisis de entropía puede revelar datos no aleatorios
-    
     \item \textbf{Visibilidad de red:} Patrones de ping inusuales pueden generar sospechas
 \end{enumerate}
 
@@ -285,20 +251,15 @@ El laboratorio demostró exitosamente que es posible evadir sistemas de Deep Pac
 \subsubsection*{Ventajas observadas:}
 \begin{itemize}
     \item Aceleración significativa del desarrollo
-    
     \item Sugerencias de mejores prácticas y optimizaciones
-    
     \item Generación de código limpio y bien documentado
-    
     \item Asistencia en la implementación de algoritmos complejos
 \end{itemize}
 
 \subsubsection*{Desafíos encontrados:}
 \begin{itemize}
     \item Necesidad de validación manual de todo el código generado
-    
     \item Algunos prompts requerían refinamiento para obtener resultados precisos
-    
     \item La IA ocasionalmente sugería enfoques menos eficientes que requerían corrección
 \end{itemize}
 
@@ -306,11 +267,8 @@ El laboratorio demostró exitosamente que es posible evadir sistemas de Deep Pac
 Se eligió la combinación de GitHub Copilot y ChatGPT por:
 \begin{itemize}
     \item \textbf{Copilot:} Excelente para autocompletado contextual y sugerencias en tiempo real
-    
     \item \textbf{ChatGPT:} Superior para explicaciones conceptuales y generación de código complejo
-    
     \item \textbf{Ventaja sobre Bard/Gemini:} Mejor comprensión de contexto de ciberseguridad
-    
     \item \textbf{Ventaja sobre Claude:} Mayor disponibilidad y integración con entornos de desarrollo
 \end{itemize}
 
@@ -318,13 +276,9 @@ Se eligió la combinación de GitHub Copilot y ChatGPT por:
 
 \begin{enumerate}
     \item \textbf{Análisis comportamental:} Monitorear patrones anómalos en tráfico ICMP
-    
     \item \textbf{Límites de tasa:} Restringir frecuencia de pings por host/usuario
-    
     \item \textbf{Inspección de entropía:} Detectar datos cifrados mediante análisis estadístico
-    
     \item \textbf{Segmentación de red:} Limitar tráfico ICMP entre segmentos críticos
-    
     \item \textbf{Logging avanzado:} Registrar metadatos detallados de paquetes ICMP
 \end{enumerate}
 
