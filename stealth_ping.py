@@ -44,6 +44,7 @@ def checksum(source_string):
 def create_icmp_packet_from_byte(byte_val, packet_id, sequence):
     """
     Create an ICMP Echo Request packet with a single byte value in the data field.
+    Mimics standard ping packet structure more closely.
     
     Args:
         byte_val (int): The byte value (0-255) to embed in the packet
@@ -58,21 +59,41 @@ def create_icmp_packet_from_byte(byte_val, packet_id, sequence):
     icmp_code = 0
     icmp_checksum = 0
     
-    # Create data with the byte value and pad to look like normal ping data
-    # Normal ping sends 32 bytes of data by default
-    data = bytes([byte_val])
-    # Pad with standard ping pattern (incrementing bytes starting from 0x08)
-    padding = bytes([(i + 8) % 256 for i in range(31)])
-    full_data = data + padding
+    # Create data that looks more like real ping data
+    # Standard ping usually includes timestamp followed by pattern data
+    # We'll embed our byte as the first byte, then add a timestamp-like structure
+    
+    # Get current time in microseconds (like ping does)
+    import time
+    timestamp = int(time.time() * 1000000) & 0xFFFFFFFFFFFFFFFF
+    
+    # Create 56 bytes of data (standard ping data size)
+    # First byte: our hidden data
+    # Next 8 bytes: timestamp (to mimic real ping)
+    # Remaining bytes: pattern data similar to ping
+    data_bytes = bytearray(56)
+    data_bytes[0] = byte_val  # Our hidden byte
+    
+    # Add timestamp bytes (8 bytes in big-endian format)
+    timestamp_bytes = struct.pack('!Q', timestamp)
+    data_bytes[1:9] = timestamp_bytes
+    
+    # Fill remaining with pattern similar to ping (incrementing pattern)
+    for i in range(9, 56):
+        data_bytes[i] = (i - 9 + 0x08) & 0xFF
+    
+    full_data = bytes(data_bytes)
     
     # Create ICMP header without checksum
-    icmp_header = struct.pack('!BBHHH', icmp_type, icmp_code, icmp_checksum, packet_id, sequence)
+    icmp_header = struct.pack('!BBHH', icmp_type, icmp_code, icmp_checksum, packet_id)
+    icmp_header += struct.pack('!H', sequence)
     
     # Calculate checksum with header and data
     icmp_checksum = checksum(icmp_header + full_data)
     
     # Recreate header with correct checksum
-    icmp_header = struct.pack('!BBHHH', icmp_type, icmp_code, icmp_checksum, packet_id, sequence)
+    icmp_header = struct.pack('!BBHH', icmp_type, icmp_code, icmp_checksum, packet_id)
+    icmp_header += struct.pack('!H', sequence)
     
     return icmp_header + full_data
 
@@ -117,6 +138,8 @@ def send_stealth_ping(target_host, encrypted_message):
         message_bytes = encrypted_message.encode('utf-8')
         print(f"UTF-8 encoded bytes: {len(message_bytes)} bytes")
         print(f"Total packets to send: {len(message_bytes) + 1}")  # +1 for end marker
+        print(f"Packet size: 64 bytes total (8 byte ICMP header + 56 byte data)")
+        print(f"Data structure: [hidden_byte][8-byte timestamp][47 pattern bytes]")
         print("-" * 50)
         
         packet_id = os.getpid() & 0xFFFF  # Use process ID as packet ID (like real ping)
@@ -145,7 +168,12 @@ def send_stealth_ping(target_host, encrypted_message):
         sock.close()
         print("-" * 50)
         print("Stealth transmission completed successfully!")
-        print("All packets sent with standard ping timing and formatting to avoid DPI detection.")
+        print("All packets sent with standard ping structure:")
+        print("- 64 bytes total (8 ICMP header + 56 data)")
+        print("- Real timestamps included for authenticity") 
+        print("- Standard ping timing (1s intervals)")
+        print("- Process ID as packet identifier")
+        print("- Sequential packet numbering")
         print("Unicode characters transmitted as UTF-8 byte sequences.")
         
     except PermissionError:
@@ -173,13 +201,15 @@ def demonstrate_normal_ping():
     print("  Checksum: Calculated")
     print("  Identifier: Process ID")
     print("  Sequence Number: Incremental")
-    print("\nICMP Data (32 bytes by default):")
-    print("  Standard pattern: 0x08, 0x09, 0x0a, 0x0b, ... 0x27")
+    print("\nICMP Data (56 bytes - standard Linux ping size):")
+    print("  Byte 0: Timestamp (8 bytes) - microseconds since epoch")
+    print("  Bytes 8-55: Pattern data (0x08, 0x09, 0x0a, ... )")
     print("\nOur stealth packets use the SAME structure but replace")
-    print("the first byte of data with our UTF-8 byte, keeping the")
-    print("same timing (1s intervals) and packet size to avoid detection.")
+    print("the first byte of data with our UTF-8 byte, then include")
+    print("real timestamp and pattern data to perfectly mimic ping.")
+    print("Timing matches standard ping (1s intervals).")
     print("Unicode characters are sent as multiple packets (one per UTF-8 byte).")
-    print("Transmission ends with byte value 255 instead of character 'b'.")
+    print("Transmission ends with byte value 255.")
     print("=" * 60)
 
 
