@@ -1,41 +1,41 @@
 #!/usr/bin/env python3
 """
-Lab 1 - Cybersecurity Demo Script
-Complete demonstration of the three activities with Unicode support
+Lab 1 - Script de Demostración de Ciberseguridad
+Demostración completa de las tres actividades con soporte Unicode
 
-This script demonstrates the complete workflow:
-1. Encrypt a message using Caesar cipher (supports Unicode)
-2. Show how the message would be transmitted via stealth ICMP packets (UTF-8 byte-level)
-3. Demonstrate the MitM attack by decoding all possible Caesar combinations
+Este script demuestra el flujo de trabajo completo:
+1. Cifrar un mensaje usando Caesar cipher (soporta Unicode)
+2. Mostrar cómo se transmitiría el mensaje vía paquetes ICMP stealth (nivel de bytes UTF-8)
+3. Demostrar el ataque MitM decodificando todas las combinaciones Caesar posibles
 """
 
 import subprocess
 import sys
 import os
 
-# Module-level constant for script directory
+# Constante a nivel de módulo para el directorio de scripts
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def run_demo():
-    """Run the complete cybersecurity lab demonstration."""
+    """Ejecutar la demostración completa del laboratorio de ciberseguridad."""
     print("=" * 70)
-    print("LAB 1 - CYBERSECURITY DEMONSTRATION")
-    print("Deep Packet Inspection (DPI) Evasion via ICMP Stealth Mode")
-    print("Unicode Support Enabled")
+    print("LAB 1 - DEMOSTRACIÓN DE CIBERSEGURIDAD")
+    print("Evasión de Deep Packet Inspection (DPI) vía Modo ICMP Stealth")
+    print("Soporte Unicode Habilitado")
     print("=" * 70)
     
-    # Demo message with Unicode
-    original_message = "Secret 世界"  # "Secret World" in Chinese
+    # Mensaje demo con Unicode
+    original_message = "Secret 世界"  # "Secret World" en chino
     shift_value = 7
     
-    print(f"\n1. ORIGINAL MESSAGE: '{original_message}' (includes Unicode)")
-    print(f"   Shift value: {shift_value}")
-    print(f"   UTF-8 byte length: {len(original_message.encode('utf-8'))} bytes")
+    print(f"\n1. MENSAJE ORIGINAL: '{original_message}' (incluye Unicode)")
+    print(f"   Valor de desplazamiento: {shift_value}")
+    print(f"   Longitud en bytes UTF-8: {len(original_message.encode('utf-8'))} bytes")
     
-    # Activity 1: Caesar Cipher Encryption
+    # Actividad 1: Cifrado Caesar
     print("\n" + "="*50)
-    print("ACTIVITY 1: CAESAR CIPHER ENCRYPTION")
+    print("ACTIVIDAD 1: CIFRADO CAESAR")
     print("="*50)
     
     result = subprocess.run([
@@ -44,47 +44,47 @@ def run_demo():
     
     if result.returncode == 0:
         print(result.stdout)
-        # Extract encrypted text from output (last line)
+        # Extraer texto cifrado de la salida (última línea)
         encrypted_message = result.stdout.strip().split('\n')[-1]
     else:
-        print(f"Error in Caesar cipher: {result.stderr}")
+        print(f"Error en Caesar cipher: {result.stderr}")
         return
     
-    # Activity 2: Stealth Mode (Simulation)
+    # Actividad 2: Modo Stealth (Simulación)
     print("\n" + "="*50)
-    print("ACTIVITY 2: STEALTH ICMP TRANSMISSION")
+    print("ACTIVIDAD 2: TRANSMISIÓN ICMP STEALTH")
     print("="*50)
-    print("NOTE: This would normally require root privileges for raw sockets.")
-    print("Simulating the stealth transmission process...\n")
+    print("NOTA: Esto normalmente requiere privilegios de root para sockets raw.")
+    print("Simulando el proceso de transmisión stealth...\n")
     
-    print(f"Encrypted message to transmit: '{encrypted_message}'")
+    print(f"Mensaje cifrado a transmitir: '{encrypted_message}'")
     
-    # Show UTF-8 byte breakdown
+    # Mostrar descomposición de bytes UTF-8
     message_bytes = encrypted_message.encode('utf-8')
-    print(f"UTF-8 encoded bytes: {list(message_bytes)}")
-    print(f"Number of ICMP packets needed: {len(message_bytes) + 1}")
-    print("\nSimulated ICMP packet transmission:")
+    print(f"Bytes codificados UTF-8: {list(message_bytes)}")
+    print(f"Número de paquetes ICMP necesarios: {len(message_bytes) + 1}")
+    print("\nTransmisión simulada de paquetes ICMP:")
     
     for i, byte_val in enumerate(message_bytes):
         try:
             char_repr = chr(byte_val) if 32 <= byte_val <= 126 else f"\\x{byte_val:02x}"
         except ValueError:
             char_repr = f"\\x{byte_val:02x}"
-        print(f"  Packet {i+1}: Byte {byte_val} ({char_repr}) embedded in ICMP data field")
-    print(f"  Packet {len(message_bytes)+1}: Marcador de fin (carácter 'b')")
+        print(f"  Paquete {i+1}: Byte {byte_val} ({char_repr}) incrustado en el campo de datos ICMP")
+    print(f"  Paquete {len(message_bytes)+1}: Marcador de fin (carácter 'b')")
     
     print("\nCada paquete se vería como un ping normal con:")
-    print("  - Standard ICMP Echo Request header (Type 8, Code 0)")
-    print("  - Process ID as packet identifier")
-    print("  - Sequential packet numbering")
-    print("  - 32-byte data payload (first byte = our UTF-8 byte)")
-    print("  - 1 second intervals between packets")
-    print("  - This mimics normal ping behavior to avoid DPI detection")
-    print("  - Unicode characters sent as multiple packets (one per UTF-8 byte)")
+    print("  - Cabecera ICMP Echo Request estándar (Type 8, Code 0)")
+    print("  - ID de proceso como identificador de paquete")
+    print("  - Numeración secuencial de paquetes")
+    print("  - Payload de datos de 32 bytes (primer byte = nuestro byte UTF-8)")
+    print("  - Intervalos de 1 segundo entre paquetes")
+    print("  - Esto imita el comportamiento normal de ping para evitar detección DPI")
+    print("  - Caracteres Unicode enviados como múltiples paquetes (uno por byte UTF-8)")
     
-    # Activity 3: MitM Attack and Decoding
+    # Actividad 3: Ataque MitM y Decodificación
     print("\n" + "="*50)
-    print("ACTIVITY 3: MAN-IN-THE-MIDDLE ATTACK & DECODING")
+    print("ACTIVIDAD 3: ATAQUE MAN-IN-THE-MIDDLE & DECODIFICACIÓN")
     print("="*50)
     
     result = subprocess.run([
@@ -94,15 +94,15 @@ def run_demo():
     if result.returncode == 0:
         print(result.stdout)
     else:
-        print(f"Error in MitM decoder: {result.stderr}")
+        print(f"Error en el decodificador MitM: {result.stderr}")
     
-    # Demonstrate with a second example (ASCII only)
+    # Demostrar con un segundo ejemplo (solo ASCII)
     print("\n" + "="*50)
-    print("BONUS: ASCII-ONLY EXAMPLE")
+    print("BONUS: EJEMPLO SOLO ASCII")
     print("="*50)
     
     ascii_message = "Hello World"
-    print(f"ASCII message: '{ascii_message}'")
+    print(f"Mensaje ASCII: '{ascii_message}'")
     
     result = subprocess.run([
         'python3', 'caesar_cipher.py', ascii_message, "3"
@@ -110,40 +110,40 @@ def run_demo():
     
     if result.returncode == 0:
         ascii_encrypted = result.stdout.strip().split('\n')[-1]
-        print(f"Encrypted: '{ascii_encrypted}'")
+        print(f"Cifrado: '{ascii_encrypted}'")
         
         result = subprocess.run([
             'python3', 'mitm_decoder.py', ascii_encrypted
         ], capture_output=True, text=True, cwd=SCRIPT_DIR)
         
         if result.returncode == 0:
-            # Extract just the result line
+            # Extraer solo la línea de resultado
             lines = result.stdout.split('\n')
             for line in lines:
                 if "Most likely plaintext" in line:
                     print(line)
     
     print("\n" + "="*70)
-    print("DEMONSTRATION COMPLETE")
+    print("DEMOSTRACIÓN COMPLETA")
     print("="*70)
-    print("\nSUMMARY:")
-    print(f"✓ Original message: '{original_message}' (Unicode supported)")
-    print(f"✓ Caesar cipher encryption (shift {shift_value}): '{encrypted_message}'")
-    print("✓ Stealth ICMP transmission simulation completed")
-    print("✓ UTF-8 byte-level transmission ensures Unicode compatibility")
-    print("✓ MitM attack successfully decoded the message")
-    print("\nThis demonstrates how attackers can:")
-    print("1. Hide data in seemingly innocent network traffic")
-    print("2. Bypass DPI systems that only look for obvious patterns")
-    print("3. Support international characters via UTF-8 encoding")
-    print("4. Intercept and decode hidden messages if they know the method")
+    print("\nRESUMEN:")
+    print(f"✓ Mensaje original: '{original_message}' (Unicode soportado)")
+    print(f"✓ Cifrado Caesar (desplazamiento {shift_value}): '{encrypted_message}'")
+    print("✓ Simulación de transmisión ICMP stealth completada")
+    print("✓ Transmisión a nivel de bytes UTF-8 asegura compatibilidad Unicode")
+    print("✓ Ataque MitM decodificó exitosamente el mensaje")
+    print("\nEsto demuestra cómo los atacantes pueden:")
+    print("1. Ocultar datos en tráfico de red aparentemente inocente")
+    print("2. Evadir sistemas DPI que solo buscan patrones obvios")
+    print("3. Soportar caracteres internacionales vía codificación UTF-8")
+    print("4. Interceptar y decodificar mensajes ocultos si conocen el método")
 
 
 def main():
-    """Main function."""
-    # Check if we're in the correct directory
+    """Función principal."""
+    # Verificar si estamos en el directorio correcto
     if not os.path.exists(os.path.join(SCRIPT_DIR, 'caesar_cipher.py')):
-        print("Error: Lab files not found. Please run from the correct directory.")
+        print("Error: Archivos del laboratorio no encontrados. Por favor ejecute desde el directorio correcto.")
         sys.exit(1)
     
     run_demo()

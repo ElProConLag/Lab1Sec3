@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Stealth ICMP Data Transmission
-Lab 1 - Cybersecurity
-Activity 2: Stealth Mode
+Transmisión de Datos ICMP Stealth
+Lab 1 - Ciberseguridad
+Actividad 2: Modo Stealth
 
-This program sends encrypted text through ICMP request packets to avoid detection 
-by Deep Packet Inspection (DPI) systems. Each UTF-8 byte is sent as a separate packet
-to support Unicode characters. The transmission ends with character 'b'.
+Este programa envía texto cifrado a través de paquetes ICMP request para evitar detección
+por sistemas de Deep Packet Inspection (DPI). Cada byte UTF-8 se envía como un paquete separado
+para soportar caracteres Unicode. La transmisión termina con el carácter 'b'.
 """
 
 import socket
@@ -18,60 +18,60 @@ import os
 
 def checksum(source_string):
     """
-    Calculate the ICMP checksum for the given data.
+    Calcular el checksum ICMP para los datos dados.
     
     Args:
-        source_string (bytes): The data to calculate checksum for
+        source_string (bytes): Los datos para calcular el checksum
         
     Returns:
-        int: The calculated checksum
+        int: El checksum calculado
     """
-    # Make sure we have an even number of bytes
+    # Asegurarse de que tenemos un número par de bytes
     if len(source_string) % 2:
         source_string += b'\x00'
     
-    # Sum all 16-bit words
+    # Sumar todas las palabras de 16 bits
     total = 0
     for i in range(0, len(source_string), 2):
         word = (source_string[i] << 8) + source_string[i + 1]
         total += word
         total = (total & 0xffff) + (total >> 16)
     
-    # One's complement
+    # Complemento a uno
     return ~total & 0xffff
 
 
 def create_icmp_packet_from_byte(byte_val, packet_id, sequence):
     """
-    Create an ICMP Echo Request packet with a single byte value in the data field.
+    Crear un paquete ICMP Echo Request con un solo valor de byte en el campo de datos.
     
     Args:
-        byte_val (int): The byte value (0-255) to embed in the packet
-        packet_id (int): The packet ID
-        sequence (int): The sequence number
+        byte_val (int): El valor del byte (0-255) a incrustar en el paquete
+        packet_id (int): El ID del paquete
+        sequence (int): El número de secuencia
         
     Returns:
-        bytes: The complete ICMP packet
+        bytes: El paquete ICMP completo
     """
-    # ICMP type (8 = Echo Request), code (0), checksum (0 for now), id, sequence
+    # ICMP type (8 = Echo Request), code (0), checksum (0 por ahora), id, sequence
     icmp_type = 8
     icmp_code = 0
     icmp_checksum = 0
     
-    # Create data with the byte value and pad to look like normal ping data
-    # Normal ping sends 32 bytes of data by default
+    # Crear datos con el valor del byte y rellenar para parecer datos de ping normales
+    # Un ping normal envía 32 bytes de datos por defecto
     data = bytes([byte_val])
-    # Pad with standard ping pattern (incrementing bytes starting from 0x08)
+    # Rellenar con patrón estándar de ping (bytes incrementales comenzando desde 0x08)
     padding = bytes([(i + 8) % 256 for i in range(31)])
     full_data = data + padding
     
-    # Create ICMP header without checksum
+    # Crear cabecera ICMP sin checksum
     icmp_header = struct.pack('!BBHHH', icmp_type, icmp_code, icmp_checksum, packet_id, sequence)
     
-    # Calculate checksum with header and data
+    # Calcular checksum con cabecera y datos
     icmp_checksum = checksum(icmp_header + full_data)
     
-    # Recreate header with correct checksum
+    # Recrear cabecera con checksum correcto
     icmp_header = struct.pack('!BBHHH', icmp_type, icmp_code, icmp_checksum, packet_id, sequence)
     
     return icmp_header + full_data
@@ -79,81 +79,81 @@ def create_icmp_packet_from_byte(byte_val, packet_id, sequence):
 
 def create_icmp_packet(data_char, packet_id, sequence):
     """
-    Create an ICMP Echo Request packet with a single character in the data field.
-    This function is kept for backward compatibility.
+    Crear un paquete ICMP Echo Request con un solo carácter en el campo de datos.
+    Esta función se mantiene para compatibilidad hacia atrás.
     
     Args:
-        data_char (str): The character to embed in the packet
-        packet_id (int): The packet ID
-        sequence (int): The sequence number
+        data_char (str): El carácter a incrustar en el paquete
+        packet_id (int): El ID del paquete
+        sequence (int): El número de secuencia
         
     Returns:
-        bytes: The complete ICMP packet
+        bytes: El paquete ICMP completo
     """
-    # Convert character to its first UTF-8 byte value
+    # Convertir carácter a su primer valor de byte UTF-8
     byte_val = data_char.encode('utf-8')[0]
     return create_icmp_packet_from_byte(byte_val, packet_id, sequence)
 
 
 def send_stealth_ping(target_host, encrypted_message):
     """
-    Send the encrypted message via stealth ICMP packets.
-    Supports Unicode by sending each UTF-8 byte as a separate packet.
+    Enviar el mensaje cifrado vía paquetes ICMP stealth.
+    Soporta Unicode enviando cada byte UTF-8 como un paquete separado.
     
     Args:
-        target_host (str): Target hostname or IP address
-        encrypted_message (str): The encrypted message to transmit (supports Unicode)
+        target_host (str): Hostname o dirección IP de destino
+        encrypted_message (str): El mensaje cifrado a transmitir (soporta Unicode)
     """
     try:
-        # Create raw socket (requires root privileges)
+        # Crear socket raw (requiere privilegios de root)
         sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
         
-        # Get target IP
+        # Obtener IP de destino
         target_ip = socket.gethostbyname(target_host)
-        print(f"Sending stealth data to {target_host} ({target_ip})")
-        print(f"Message to transmit: '{encrypted_message}'")
+        print(f"Enviando datos stealth a {target_host} ({target_ip})")
+        print(f"Mensaje a transmitir: '{encrypted_message}'")
         
-        # Convert message to UTF-8 bytes to support Unicode characters
+        # Convertir mensaje a bytes UTF-8 para soportar caracteres Unicode
         message_bytes = encrypted_message.encode('utf-8')
-        print(f"UTF-8 encoded bytes: {len(message_bytes)} bytes")
-        print(f"Total packets to send: {len(message_bytes) + 1}")  # +1 for 'b' end marker
+        print(f"Bytes codificados UTF-8: {len(message_bytes)} bytes")
+        print(f"Total de paquetes a enviar: {len(message_bytes) + 1}")  # +1 para marcador de fin 'b'
         print("-" * 50)
         
-        packet_id = os.getpid() & 0xFFFF  # Use process ID as packet ID (like real ping)
+        packet_id = os.getpid() & 0xFFFF  # Usar ID de proceso como ID de paquete (como ping real)
         
-        # Send each UTF-8 byte as a separate ICMP packet
+        # Enviar cada byte UTF-8 como un paquete ICMP separado
         for i, byte_val in enumerate(message_bytes):
             sequence = i + 1
             packet = create_icmp_packet_from_byte(byte_val, packet_id, sequence)
             
-            # Show character representation for readability
+            # Mostrar representación de carácter para legibilidad
             try:
                 char_repr = chr(byte_val) if 32 <= byte_val <= 126 else f"\\x{byte_val:02x}"
             except ValueError:
                 char_repr = f"\\x{byte_val:02x}"
             
-            print(f"Packet {sequence}: Sending byte {byte_val} ({char_repr}) in ICMP data field")
+            print(f"Paquete {sequence}: Enviando byte {byte_val} ({char_repr}) en el campo de datos ICMP")
             sock.sendto(packet, (target_ip, 0))
-            time.sleep(1)  # 1 second delay between packets (like normal ping)
+            time.sleep(1)  # Retraso de 1 segundo entre paquetes (como ping normal)
         
-        # Send end marker (character 'b')
+        # Enviar marcador de fin (carácter 'b')
         final_sequence = len(message_bytes) + 1
         end_packet = create_icmp_packet_from_byte(ord('b'), packet_id, final_sequence)
-        print(f"Packet {final_sequence}: Sending end marker (character 'b')")
+        print(f"Paquete {final_sequence}: Enviando marcador de fin (carácter 'b')")
         sock.sendto(end_packet, (target_ip, 0))
         
         sock.close()
         print("-" * 50)
-        print("Stealth transmission completed successfully!")
-        print("All packets sent with standard ping timing and formatting to avoid DPI detection.")
-        print("Unicode characters transmitted as UTF-8 byte sequences.")
+        print("¡Transmisión stealth completada exitosamente!")
+        print("Todos los paquetes enviados con timing y formato estándar de ping para evitar detección DPI.")
+        print("Caracteres Unicode transmitidos como secuencias de bytes UTF-8.")
         
     except PermissionError:
-        print("Error: This program requires root privileges to create raw sockets.")
-        print("Please run with sudo: sudo python3 stealth_ping.py")
+        print("Error: Este programa requiere privilegios de root para crear sockets raw.")
+        print("Por favor ejecute con sudo: sudo python3 stealth_ping.py")
         sys.exit(1)
     except socket.gaierror:
-        print(f"Error: Could not resolve hostname '{target_host}'")
+        print(f"Error: No se pudo resolver el hostname '{target_host}'")
         sys.exit(1)
     except Exception as e:
         print(f"Error: {e}")
@@ -162,33 +162,33 @@ def send_stealth_ping(target_host, encrypted_message):
 
 def demonstrate_normal_ping():
     """
-    Show what a normal ping packet looks like for comparison.
+    Mostrar cómo se ve un paquete ping normal para comparación.
     """
     print("=" * 60)
-    print("NORMAL PING PACKET STRUCTURE (for comparison):")
+    print("ESTRUCTURA DE PAQUETE PING NORMAL (para comparación):")
     print("=" * 60)
-    print("ICMP Header (8 bytes):")
+    print("Cabecera ICMP (8 bytes):")
     print("  Type: 8 (Echo Request)")
     print("  Code: 0")
-    print("  Checksum: Calculated")
-    print("  Identifier: Process ID")
+    print("  Checksum: Calculado")
+    print("  Identifier: ID de proceso")
     print("  Sequence Number: Incremental")
-    print("\nICMP Data (32 bytes by default):")
-    print("  Standard pattern: 0x08, 0x09, 0x0a, 0x0b, ... 0x27")
-    print("\nOur stealth packets use the SAME structure but replace")
-    print("the first byte of data with our UTF-8 byte, keeping the")
-    print("same timing (1s intervals) and packet size to avoid detection.")
-    print("Unicode characters are sent as multiple packets (one per UTF-8 byte).")
-    print("Transmission ends with character 'b'.")
+    print("\nDatos ICMP (32 bytes por defecto):")
+    print("  Patrón estándar: 0x08, 0x09, 0x0a, 0x0b, ... 0x27")
+    print("\nNuestros paquetes stealth usan la MISMA estructura pero reemplazan")
+    print("el primer byte de datos con nuestro byte UTF-8, manteniendo el")
+    print("mismo timing (intervalos de 1s) y tamaño de paquete para evitar detección.")
+    print("Caracteres Unicode se envían como múltiples paquetes (uno por byte UTF-8).")
+    print("La transmisión termina con el carácter 'b'.")
     print("=" * 60)
 
 
 def main():
-    """Main function to handle command line arguments and execute stealth transmission."""
+    """Función principal para manejar argumentos de línea de comandos y ejecutar transmisión stealth."""
     if len(sys.argv) != 3:
-        print("Usage: sudo python3 stealth_ping.py <target_host> <encrypted_message>")
-        print("Example: sudo python3 stealth_ping.py localhost 'Khoor Zruog'")
-        print("\nNote: This program requires root privileges to create raw sockets.")
+        print("Uso: sudo python3 stealth_ping.py <host_destino> <mensaje_cifrado>")
+        print("Ejemplo: sudo python3 stealth_ping.py localhost 'Khoor Zruog'")
+        print("\nNota: Este programa requiere privilegios de root para crear sockets raw.")
         sys.exit(1)
     
     target_host = sys.argv[1]

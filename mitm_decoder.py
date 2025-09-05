@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Man-in-the-Middle ICMP Decoder
-Lab 1 - Cybersecurity
-Activity 3: MitM
+Decodificador ICMP Man-in-the-Middle
+Lab 1 - Ciberseguridad
+Actividad 3: MitM
 
-This program intercepts ICMP packets and attempts to decode Caesar cipher messages
-by trying all possible shift combinations (0-25) and highlighting the most probable
-plaintext in green. Supports Unicode characters transmitted as UTF-8 byte sequences.
+Este programa intercepta paquetes ICMP e intenta decodificar mensajes Caesar cipher
+probando todas las combinaciones de desplazamiento posibles (0-25) y resaltando el
+texto plano más probable en verde. Soporta caracteres Unicode transmitidos como secuencias de bytes UTF-8.
 """
 
 import socket
@@ -18,30 +18,30 @@ from collections import Counter
 
 def caesar_decrypt(text, shift):
     """
-    Decrypt text using Caesar cipher with the given shift value.
-    Supports Unicode characters - only ASCII letters are decrypted, Unicode characters are preserved.
+    Descifrar texto usando Caesar cipher con el valor de desplazamiento dado.
+    Soporta caracteres Unicode - solo las letras ASCII son descifradas, los caracteres Unicode se preservan.
     
     Args:
-        text (str): The text to decrypt (supports Unicode)
-        shift (int): The number of positions to shift back
+        text (str): El texto a descifrar (soporta Unicode)
+        shift (int): El número de posiciones a desplazar hacia atrás
         
     Returns:
-        str: The decrypted text with Unicode characters preserved
+        str: El texto descifrado con caracteres Unicode preservados
     """
     decrypted_text = ""
     
     for char in text:
-        # Only apply Caesar cipher to ASCII letters, preserve all other characters including Unicode
-        if char.isalpha() and ord(char) < 128:  # ASCII letters only
-            # Handle uppercase letters
+        # Solo aplicar Caesar cipher a letras ASCII, preservar todos los otros caracteres incluyendo Unicode
+        if char.isalpha() and ord(char) < 128:  # Solo letras ASCII
+            # Manejar letras mayúsculas
             if char.isupper():
                 decrypted_char = chr((ord(char) - ord('A') - shift) % 26 + ord('A'))
-            # Handle lowercase letters
+            # Manejar letras minúsculas
             else:
                 decrypted_char = chr((ord(char) - ord('a') - shift) % 26 + ord('a'))
             decrypted_text += decrypted_char
         else:
-            # Non-ASCII alphabetic characters and all other characters remain unchanged
+            # Caracteres alfabéticos no ASCII y todos los otros caracteres permanecen sin cambio
             decrypted_text += char
     
     return decrypted_text
@@ -49,16 +49,16 @@ def caesar_decrypt(text, shift):
 
 def calculate_english_score(text):
     """
-    Calculate a score indicating how likely the text is to be English.
-    Higher scores indicate more likely English text.
+    Calcular una puntuación indicando qué tan probable es que el texto sea inglés.
+    Puntuaciones más altas indican texto inglés más probable.
     
     Args:
-        text (str): The text to analyze
+        text (str): El texto a analizar
         
     Returns:
-        float: The English likelihood score
+        float: La puntuación de probabilidad de inglés
     """
-    # Convert to uppercase and remove non-alphabetic characters for analysis
+    # Convertir a mayúsculas y remover caracteres no alfabéticos para análisis
     clean_text = ''.join(char.upper() for char in text if char.isalpha())
     
     if not clean_text:
@@ -66,7 +66,7 @@ def calculate_english_score(text):
     
     score = 0
     
-    # Check for common English words (case-insensitive)
+    # Verificar palabras comunes en inglés (insensible a mayúsculas/minúsculas)
     common_words = ['HELLO', 'WORLD', 'THE', 'AND', 'FOR', 'ARE', 'BUT', 'NOT', 'YOU', 'ALL', 
                    'CAN', 'HER', 'WAS', 'ONE', 'OUR', 'HAD', 'HAVE', 'SECRET', 'MESSAGE',
                    'THIS', 'THAT', 'WITH', 'WILL', 'FROM', 'THEY', 'KNOW', 'ATTACK',
@@ -75,14 +75,14 @@ def calculate_english_score(text):
                    'MAKE', 'MANY', 'OVER', 'SUCH', 'TAKE', 'THAN', 'THEM', 'ICMP',
                    'WELL', 'WERE', 'PACKET', 'NETWORK', 'SECURITY', 'CIPHER', 'KEY']
     
-    # Split by spaces and check each word
+    # Dividir por espacios y verificar cada palabra
     words = text.upper().split()
     for word in words:
         word_clean = ''.join(char for char in word if char.isalpha())
         if word_clean in common_words:
-            score += 50  # High bonus for common English words
+            score += 50  # Bonificación alta para palabras comunes en inglés
     
-    # Check for common English letter patterns
+    # Verificar patrones de letras comunes en inglés
     if 'TH' in clean_text:
         score += 10
     if 'HE' in clean_text:
@@ -94,26 +94,26 @@ def calculate_english_score(text):
     if 'AN' in clean_text:
         score += 10
     
-    # Bonus for having vowels (A, E, I, O, U)
+    # Bonificación por tener vocales (A, E, I, O, U)
     vowels = sum(1 for char in clean_text if char in 'AEIOU')
     consonants = len(clean_text) - vowels
     
-    # English typically has a vowel ratio between 35-45%
+    # El inglés típicamente tiene una proporción de vocales entre 35-45%
     if len(clean_text) > 0:
         vowel_ratio = vowels / len(clean_text)
         if 0.30 <= vowel_ratio <= 0.50:
             score += 20
     
-    # Penalize unusual letter combinations
+    # Penalizar combinaciones de letras inusuales
     unusual_patterns = ['QQ', 'XX', 'ZZ', 'JJ', 'VV', 'WW']
     for pattern in unusual_patterns:
         if pattern in clean_text:
             score -= 20
     
-    # Check for reasonable word length distribution
+    # Verificar distribución de longitud de palabras razonable
     if words:
         avg_word_length = sum(len(''.join(char for char in word if char.isalpha())) for word in words) / len(words)
-        if 3 <= avg_word_length <= 7:  # Typical English word lengths
+        if 3 <= avg_word_length <= 7:  # Longitudes típicas de palabras en inglés
             score += 10
     
     return score
@@ -121,26 +121,26 @@ def calculate_english_score(text):
 
 def parse_icmp_packet(packet):
     """
-    Parse an ICMP packet and extract the byte value from the data field.
+    Analizar un paquete ICMP y extraer el valor del byte del campo de datos.
     
     Args:
-        packet (bytes): The raw packet data
+        packet (bytes): Los datos del paquete crudo
         
     Returns:
-        tuple: (icmp_type, byte_value, sequence) or (None, None, None) if not a valid ICMP Echo Request
+        tuple: (icmp_type, byte_value, sequence) o (None, None, None) si no es un ICMP Echo Request válido
     """
     try:
-        # Parse IP header (20 bytes minimum)
+        # Analizar cabecera IP (mínimo 20 bytes)
         ip_header = struct.unpack('!BBHHHBBH4s4s', packet[:20])
         ip_header_length = (ip_header[0] & 0xF) * 4
         
-        # Parse ICMP header (8 bytes)
+        # Analizar cabecera ICMP (8 bytes)
         icmp_header = struct.unpack('!BBHHH', packet[ip_header_length:ip_header_length + 8])
         icmp_type, icmp_code, checksum, packet_id, sequence = icmp_header
         
-        # Only process ICMP Echo Request packets (type 8)
+        # Solo procesar paquetes ICMP Echo Request (type 8)
         if icmp_type == 8:
-            # Extract the first byte of ICMP data (our hidden byte)
+            # Extraer el primer byte de datos ICMP (nuestro byte oculto)
             data_start = ip_header_length + 8
             if len(packet) > data_start:
                 byte_value = packet[data_start]
@@ -154,17 +154,17 @@ def parse_icmp_packet(packet):
 
 def capture_icmp_packets():
     """
-    Capture ICMP packets and extract hidden bytes, then reconstruct UTF-8 message.
+    Capturar paquetes ICMP y extraer bytes ocultos, luego reconstruir mensaje UTF-8.
     
     Returns:
-        str: The reconstructed message from ICMP packets
+        str: El mensaje reconstruido de los paquetes ICMP
     """
     try:
-        # Create raw socket to capture ICMP packets
+        # Crear socket raw para capturar paquetes ICMP
         sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
         
-        print("Listening for ICMP packets...")
-        print("Press Ctrl+C to stop and analyze captured data")
+        print("Escuchando paquetes ICMP...")
+        print("Presione Ctrl+C para parar y analizar los datos capturados")
         print("-" * 50)
         
         captured_bytes = {}
@@ -174,58 +174,58 @@ def capture_icmp_packets():
             icmp_type, byte_value, sequence = parse_icmp_packet(packet)
             
             if icmp_type == 8 and byte_value is not None:  # ICMP Echo Request
-                # Show character representation for readability
+                # Mostrar representación de carácter para legibilidad
                 try:
                     char_repr = chr(byte_value) if 32 <= byte_value <= 126 else f"\\x{byte_value:02x}"
                 except ValueError:
                     char_repr = f"\\x{byte_value:02x}"
                 
-                print(f"Captured packet {sequence}: Byte {byte_value} ({char_repr}) from {addr[0]}")
+                print(f"Paquete capturado {sequence}: Byte {byte_value} ({char_repr}) de {addr[0]}")
                 captured_bytes[sequence] = byte_value
                 
-                # Check if we received the end marker (character 'b')
+                # Verificar si recibimos el marcador de fin (carácter 'b')
                 if byte_value == ord('b'):
-                    print("End marker (character 'b') received. Stopping capture.")
+                    print("Marcador de fin (carácter 'b') recibido. Deteniendo captura.")
                     break
         
         sock.close()
         
-        # Reconstruct message in sequence order (excluding the end marker)
+        # Reconstruir mensaje en orden de secuencia (excluyendo el marcador de fin)
         byte_list = []
         for seq in sorted(captured_bytes.keys()):
-            if captured_bytes[seq] != ord('b'):  # Exclude end marker
+            if captured_bytes[seq] != ord('b'):  # Excluir marcador de fin
                 byte_list.append(captured_bytes[seq])
         
-        # Convert bytes back to UTF-8 string
+        # Convertir bytes de vuelta a cadena UTF-8
         try:
             message = bytes(byte_list).decode('utf-8')
             return message
         except UnicodeDecodeError as e:
-            print(f"Warning: Could not decode as UTF-8: {e}")
-            # Return as latin-1 to preserve all byte values
+            print(f"Advertencia: No se pudo decodificar como UTF-8: {e}")
+            # Devolver como latin-1 para preservar todos los valores de byte
             return bytes(byte_list).decode('latin-1')
         
     except PermissionError:
-        print("Error: This program requires root privileges to capture packets.")
-        print("Please run with sudo: sudo python3 mitm_decoder.py")
+        print("Error: Este programa requiere privilegios de root para capturar paquetes.")
+        print("Por favor ejecute con sudo: sudo python3 mitm_decoder.py")
         return None
     except KeyboardInterrupt:
-        print("\nCapture stopped by user.")
+        print("\nCaptura detenida por el usuario.")
         sock.close()
         
-        # Reconstruct message from captured data
+        # Reconstruir mensaje de los datos capturados
         byte_list = []
         for seq in sorted(captured_bytes.keys()):
-            if captured_bytes[seq] != ord('b'):  # Exclude end marker
+            if captured_bytes[seq] != ord('b'):  # Excluir marcador de fin
                 byte_list.append(captured_bytes[seq])
         
-        # Convert bytes back to UTF-8 string
+        # Convertir bytes de vuelta a cadena UTF-8
         try:
             message = bytes(byte_list).decode('utf-8')
             return message
         except UnicodeDecodeError as e:
-            print(f"Warning: Could not decode as UTF-8: {e}")
-            # Return as latin-1 to preserve all byte values
+            print(f"Advertencia: No se pudo decodificar como UTF-8: {e}")
+            # Devolver como latin-1 para preservar todos los valores de byte
             return bytes(byte_list).decode('latin-1')
     except Exception as e:
         print(f"Error: {e}")
@@ -234,76 +234,76 @@ def capture_icmp_packets():
 
 def analyze_captured_message(encrypted_message):
     """
-    Analyze the captured message by trying all Caesar cipher shifts.
+    Analizar el mensaje capturado probando todos los desplazamientos Caesar cipher.
     
     Args:
-        encrypted_message (str): The captured encrypted message
+        encrypted_message (str): El mensaje cifrado capturado
     """
     if not encrypted_message:
-        print("No message captured.")
+        print("No se capturó ningún mensaje.")
         return
     
-    print(f"\nCaptured encrypted message: '{encrypted_message}'")
-    print("\nTrying all possible Caesar cipher shifts:")
+    print(f"\nMensaje cifrado capturado: '{encrypted_message}'")
+    print("\nProbando todos los desplazamientos Caesar cipher posibles:")
     print("=" * 70)
     
-    # Colors for terminal output
-    GREEN = '\033[92m'  # Green color
-    RESET = '\033[0m'   # Reset color
+    # Colores para salida de terminal
+    GREEN = '\033[92m'  # Color verde
+    RESET = '\033[0m'   # Resetear color
     
     best_score = float('-inf')
     best_shift = 0
     best_message = ""
     
-    # Try all possible shifts (0-25)
+    # Probar todos los desplazamientos posibles (0-25)
     for shift in range(26):
         decrypted = caesar_decrypt(encrypted_message, shift)
         score = calculate_english_score(decrypted)
         
-        # Track the best (most likely English) result
+        # Rastrear el mejor resultado (más probable en inglés)
         if score > best_score:
             best_score = score
             best_shift = shift
             best_message = decrypted
         
-        print(f"Shift {shift:2d}: {decrypted} (Score: {score:.2f})")
+        print(f"Desplazamiento {shift:2d}: {decrypted} (Puntuación: {score:.2f})")
     
     print("=" * 70)
-    print(f"{GREEN}Most likely plaintext (Shift {best_shift}): {best_message}{RESET}")
-    print(f"English likelihood score: {best_score:.2f}")
+    print(f"{GREEN}Texto plano más probable (Desplazamiento {best_shift}): {best_message}{RESET}")
+    print(f"Puntuación de probabilidad de inglés: {best_score:.2f}")
 
 
 def simulate_with_test_data(test_message):
     """
-    Simulate the MitM attack with test data instead of capturing live packets.
+    Simular el ataque MitM con datos de prueba en lugar de capturar paquetes en vivo.
     
     Args:
-        test_message (str): The encrypted message to analyze
+        test_message (str): El mensaje cifrado a analizar
     """
-    print("SIMULATION MODE: Analyzing provided encrypted message")
+    print("MODO SIMULACIÓN: Analizando mensaje cifrado proporcionado")
     print("-" * 50)
     analyze_captured_message(test_message)
 
 
 def main():
-    """Main function to handle command line arguments and execute MitM decoder."""
+    """Función principal para manejar argumentos de línea de comandos y ejecutar el decodificador MitM."""
     if len(sys.argv) == 1:
-        # Live packet capture mode
-        print("Starting MitM ICMP packet capture and decoder...")
+        # Modo de captura de paquetes en vivo
+        print("Iniciando captura de paquetes ICMP y decodificador MitM...")
         captured_message = capture_icmp_packets()
         if captured_message:
             analyze_captured_message(captured_message)
     elif len(sys.argv) == 2:
-        # Simulation mode with provided encrypted message
+        # Modo simulación con mensaje cifrado proporcionado
         test_message = sys.argv[1]
         simulate_with_test_data(test_message)
     else:
-        print("Usage:")
-        print("  sudo python3 mitm_decoder.py                    # Live packet capture")
-        print("  python3 mitm_decoder.py <encrypted_message>     # Simulation mode")
-        print("\nExamples:")
-        print("  sudo python3 mitm_decoder.py                    # Capture live ICMP packets")
-        print("  python3 mitm_decoder.py 'Khoor Zruog'           # Analyze given encrypted text")
+        print("Uso:")
+        print("  sudo python3 mitm_decoder.py                    # Captura de paquetes en vivo")
+        print("  python3 mitm_decoder.py <mensaje_cifrado>       # Modo simulación")
+        print("\nEjemplos:")
+        print("  sudo python3 mitm_decoder.py                    # Capturar paquetes ICMP en vivo")
+        print("  python3 mitm_decoder.py 'Khoor Zruog'           # Analizar texto cifrado dado")
         sys.exit(1)
 
 
