@@ -116,7 +116,7 @@ def send_stealth_ping(target_host, encrypted_message):
         # Convertir mensaje a bytes UTF-8 para soportar caracteres Unicode
         message_bytes = encrypted_message.encode('utf-8')
         print(f"Bytes codificados UTF-8: {len(message_bytes)} bytes")
-        print(f"Total de paquetes a enviar: {len(message_bytes) + 1}")  # +1 para marcador de fin 'b'
+        print(f"Total de paquetes a enviar: {len(message_bytes) + 1}")  # +1 para marcador de fin
         print("-" * 50)
         
         packet_id = os.getpid() & 0xFFFF  # Usar ID de proceso como ID de paquete (como ping real)
