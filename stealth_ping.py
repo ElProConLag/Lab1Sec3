@@ -179,7 +179,7 @@ def demonstrate_normal_ping():
     print("el primer byte de datos con nuestro byte UTF-8, manteniendo el")
     print("mismo timing (intervalos de 1s) y tamaño de paquete para evitar detección.")
     print("Caracteres Unicode se envían como múltiples paquetes (uno por byte UTF-8).")
-    print("La transmisión termina con el carácter 'b'.")
+    print("La transmisión termina con el carácter «b».")
     print("=" * 60)
 
 
