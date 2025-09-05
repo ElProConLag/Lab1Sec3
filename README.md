@@ -172,12 +172,15 @@ Un atacante dentro de una red corporativa quiere exfiltrar datos sensibles sin a
 
 ```
 Lab1Sec3/
-├── Informe_Laboratorio_1__2025___Sem_2_.pdf  # Requisitos originales del laboratorio
-├── caesar_cipher.py                          # Actividad 1: Cifrado
-├── stealth_ping.py                          # Actividad 2: Transmisión stealth
-├── mitm_decoder.py                          # Actividad 3: Ataque MitM
-├── demo.py                                  # Demostración completa
-└── README.md                                # Esta documentación
+├── docs/
+│   ├── Informe_Laboratorio_1__2025___Sem_2_.pdf  # Requisitos originales del laboratorio
+│   └── not_informe_2025_2.pdf                    # Documento de referencia de prácticas a evitar
+├── caesar_cipher.py                              # Actividad 1: Cifrado
+├── stealth_ping.py                              # Actividad 2: Transmisión stealth
+├── mitm_decoder.py                              # Actividad 3: Ataque MitM
+├── demo.py                                      # Demostración completa
+├── lab01_informe.tex                            # Informe en LaTeX
+└── README.md                                    # Esta documentación
 ```
 
 ## Requisitos del Informe de Laboratorio
