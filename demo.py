@@ -71,7 +71,7 @@ def run_demo():
         except ValueError:
             char_repr = f"\\x{byte_val:02x}"
         print(f"  Packet {i+1}: Byte {byte_val} ({char_repr}) embedded in ICMP data field")
-    print(f"  Packet {len(message_bytes)+1}: End marker (byte 255)")
+    print(f"  Packet {len(message_bytes)+1}: End marker (character 'b')")
     
     print("\nEach packet would look like a normal ping with:")
     print("  - Standard ICMP Echo Request header (Type 8, Code 0)")

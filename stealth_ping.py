@@ -6,7 +6,7 @@ Activity 2: Stealth Mode
 
 This program sends encrypted text through ICMP request packets to avoid detection 
 by Deep Packet Inspection (DPI) systems. Each UTF-8 byte is sent as a separate packet
-to support Unicode characters. The transmission ends with a special marker (byte 255).
+to support Unicode characters. The transmission ends with character 'b'.
 """
 
 import socket
@@ -116,7 +116,7 @@ def send_stealth_ping(target_host, encrypted_message):
         # Convert message to UTF-8 bytes to support Unicode characters
         message_bytes = encrypted_message.encode('utf-8')
         print(f"UTF-8 encoded bytes: {len(message_bytes)} bytes")
-        print(f"Total packets to send: {len(message_bytes) + 1}")  # +1 for end marker
+        print(f"Total packets to send: {len(message_bytes) + 1}")  # +1 for 'b' end marker
         print("-" * 50)
         
         packet_id = os.getpid() & 0xFFFF  # Use process ID as packet ID (like real ping)
@@ -136,10 +136,10 @@ def send_stealth_ping(target_host, encrypted_message):
             sock.sendto(packet, (target_ip, 0))
             time.sleep(1)  # 1 second delay between packets (like normal ping)
         
-        # Send end marker (special byte value 255)
+        # Send end marker (character 'b')
         final_sequence = len(message_bytes) + 1
-        end_packet = create_icmp_packet_from_byte(255, packet_id, final_sequence)
-        print(f"Packet {final_sequence}: Sending end marker (byte 255)")
+        end_packet = create_icmp_packet_from_byte(ord('b'), packet_id, final_sequence)
+        print(f"Packet {final_sequence}: Sending end marker (character 'b')")
         sock.sendto(end_packet, (target_ip, 0))
         
         sock.close()
@@ -179,7 +179,7 @@ def demonstrate_normal_ping():
     print("the first byte of data with our UTF-8 byte, keeping the")
     print("same timing (1s intervals) and packet size to avoid detection.")
     print("Unicode characters are sent as multiple packets (one per UTF-8 byte).")
-    print("Transmission ends with byte value 255 instead of character 'b'.")
+    print("Transmission ends with character 'b'.")
     print("=" * 60)
 
 

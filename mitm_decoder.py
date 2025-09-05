@@ -183,9 +183,9 @@ def capture_icmp_packets():
                 print(f"Captured packet {sequence}: Byte {byte_value} ({char_repr}) from {addr[0]}")
                 captured_bytes[sequence] = byte_value
                 
-                # Check if we received the end marker (byte 255)
-                if byte_value == 255:
-                    print("End marker (byte 255) received. Stopping capture.")
+                # Check if we received the end marker (character 'b')
+                if byte_value == ord('b'):
+                    print("End marker (character 'b') received. Stopping capture.")
                     break
         
         sock.close()
@@ -193,7 +193,7 @@ def capture_icmp_packets():
         # Reconstruct message in sequence order (excluding the end marker)
         byte_list = []
         for seq in sorted(captured_bytes.keys()):
-            if captured_bytes[seq] != 255:  # Exclude end marker
+            if captured_bytes[seq] != ord('b'):  # Exclude end marker
                 byte_list.append(captured_bytes[seq])
         
         # Convert bytes back to UTF-8 string
@@ -216,7 +216,7 @@ def capture_icmp_packets():
         # Reconstruct message from captured data
         byte_list = []
         for seq in sorted(captured_bytes.keys()):
-            if captured_bytes[seq] != 255:  # Exclude end marker
+            if captured_bytes[seq] != ord('b'):  # Exclude end marker
                 byte_list.append(captured_bytes[seq])
         
         # Convert bytes back to UTF-8 string
